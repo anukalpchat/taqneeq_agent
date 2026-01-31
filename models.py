@@ -211,6 +211,11 @@ class AgentDecision(BaseModel):
         ge=1, 
         description="Number of transactions in pattern"
     )
+    avg_amount: float = Field(
+        ..., 
+        gt=0.0, 
+        description="Average transaction amount in rupees"
+    )
     cost_analysis: str = Field(
         ..., 
         min_length=30, 

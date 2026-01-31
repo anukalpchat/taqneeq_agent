@@ -1,21 +1,110 @@
 {
   "metadata": {
-    "timestamp": "2026-02-01T00:29:19.155198",
-    "model_used": "gemini-1.5-flash",
-    "inference_time_seconds": 4.61,
-    "total_decisions": 0
+    "timestamp": "2026-02-01T00:51:00.541120",
+    "model_used": "llama-3.3-70b-versatile",
+    "inference_time_seconds": 4.69,
+    "total_decisions": 8
   },
-  "decisions": [],
+  "decisions": [
+    {
+      "pattern_detected": "HDFC Rewards >\u20b95,000 failing during 14:00-16:00 window",
+      "affected_volume": 35,
+      "avg_amount": 8659.805714285716,
+      "cost_analysis": "Reroute cost: \u20b9525 (35 \u00d7 \u20b915). Revenue saved: \u20b96,050.50 (35 \u00d7 \u20b9173 avg margin). Net: +\u20b95,525.50",
+      "temporal_signal": "stable",
+      "decision": "REROUTE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: High-value segment with \u20b9173 average margin creates \u20b95,525.50 net profit opportunity. CTO perspective: Error pattern (RISK_THRESHOLD_EXCEEDED) indicates policy issue, not infrastructure - rerouting will succeed. Risk Manager: Transaction amounts and customer tier do not indicate fraud. UNANIMOUS DECISION: Reroute to Axis Bank for immediate recovery.",
+      "confidence": 0.94
+    },
+    {
+      "pattern_detected": "ICICI Debit \u20b91,000-\u20b95,000 failing during 01:00-20:00 window",
+      "affected_volume": 16,
+      "avg_amount": 1840.615625,
+      "cost_analysis": "Reroute cost: \u20b9240 (16 \u00d7 \u20b915). Revenue saved: \u20b9294.24 (16 \u00d7 \u20b918.4 avg margin). Net: +\u20b954.24",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b918.4 average margin creates \u20b954.24 net profit opportunity, but not enough to justify intervention. CTO perspective: Error pattern (SERVICE_UNAVAILABLE) indicates infrastructure issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.6
+    },
+    {
+      "pattern_detected": "HDFC Rewards \u20b91,000-\u20b95,000 failing during 01:00-13:00 window",
+      "affected_volume": 13,
+      "avg_amount": 2089.3653846153848,
+      "cost_analysis": "Reroute cost: \u20b9195 (13 \u00d7 \u20b915). Revenue saved: \u20b9208.96 (13 \u00d7 \u20b916.08 avg margin). Net: +\u20b913.96",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b916.08 average margin creates \u20b913.96 net profit opportunity, but not enough to justify intervention. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.55
+    },
+    {
+      "pattern_detected": "Kotak Corporate \u20b9100-\u20b91,000 failing during 08:00-10:00 window",
+      "affected_volume": 14,
+      "avg_amount": 630.445,
+      "cost_analysis": "Reroute cost: \u20b9210 (14 \u00d7 \u20b915). Revenue saved: \u20b9140.84 (14 \u00d7 \u20b910.06 avg margin). Net: -\u20b969.16",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b910.06 average margin creates -\u20b969.16 net loss. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.5
+    },
+    {
+      "pattern_detected": "Kotak Debit \u20b9100-\u20b91,000 failing during 17:00-20:00 window",
+      "affected_volume": 15,
+      "avg_amount": 570.1046666666666,
+      "cost_analysis": "Reroute cost: \u20b9225 (15 \u00d7 \u20b915). Revenue saved: \u20b9151.2 (15 \u00d7 \u20b910.08 avg margin). Net: -\u20b973.8",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b910.08 average margin creates -\u20b973.8 net loss. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.5
+    },
+    {
+      "pattern_detected": "SBI Corporate \u20b9100-\u20b91,000 failing during 18:00-24:00 window",
+      "affected_volume": 14,
+      "avg_amount": 545.4907142857143,
+      "cost_analysis": "Reroute cost: \u20b9210 (14 \u00d7 \u20b915). Revenue saved: \u20b9108.8 (14 \u00d7 \u20b97.77 avg margin). Net: -\u20b9101.2",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b97.77 average margin creates -\u20b9101.2 net loss. CTO perspective: Error pattern (DAILY_LIMIT_REACHED) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.45
+    },
+    {
+      "pattern_detected": "ICICI Credit \u20b9100-\u20b91,000 failing during 05:00-16:00 window",
+      "affected_volume": 12,
+      "avg_amount": 572.6008333333333,
+      "cost_analysis": "Reroute cost: \u20b9180 (12 \u00d7 \u20b915). Revenue saved: \u20b996 (12 \u00d7 \u20b98 avg margin). Net: -\u20b984",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b98 average margin creates -\u20b984 net loss. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.4
+    },
+    {
+      "pattern_detected": "Kotak Rewards \u20b9100-\u20b91,000 failing during 11:00-19:00 window",
+      "affected_volume": 11,
+      "avg_amount": 584.8890909090909,
+      "cost_analysis": "Reroute cost: \u20b9165 (11 \u00d7 \u20b915). Revenue saved: \u20b987.12 (11 \u00d7 \u20b97.92 avg margin). Net: -\u20b977.88",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Low-value segment with \u20b97.92 average margin creates -\u20b977.88 net loss. CTO perspective: Error pattern (SUSPICIOUS_ACTIVITY) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
+      "confidence": 0.4
+    }
+  ],
   "metrics": {
     "total_transactions": 2500,
     "total_failures": 459,
-    "reroutes_executed": 0,
-    "reroutes_ignored": 0,
+    "reroutes_executed": 1,
+    "reroutes_ignored": 7,
     "alerts_raised": 0,
-    "total_cost": 0.0,
-    "total_revenue_saved": 0.0,
-    "net_profit": 0.0,
-    "patterns_discovered": 0,
+    "total_cost": 525.0,
+    "total_revenue_saved": 6061.864000000001,
+    "net_profit": 5536.864000000001,
+    "patterns_discovered": 8,
     "decision_accuracy": 0.85
   }
 }

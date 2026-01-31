@@ -159,7 +159,7 @@ PATTERNS = {
 # LLM CONFIGURATION
 # ============================================================================
 
-LLM_MODEL = "gemini-1.5-flash"          # Gemini 1.5 Flash (fallback with separate quota)
+LLM_MODEL = "llama-3.3-70b-versatile"          # Gemini 1.5 Flash (fallback with separate quota)
 LLM_TEMPERATURE = 0.1                   # Low temperature for deterministic reasoning
 MAX_OUTPUT_TOKENS = 2000                # Maximum tokens for LLM response
 LLM_TIMEOUT_SECONDS = 30

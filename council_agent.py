@@ -17,7 +17,7 @@ from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 from models import Transaction, FailureCluster, AgentDecision, PerformanceMetrics
 from config import (
@@ -33,8 +33,11 @@ from config import (
 # Load environment variables
 load_dotenv()
 
-# Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+# Configure Groq API
+api_key = os.getenv("GROQ_API_KEY")
+if not api_key:
+    raise ValueError("Missing API key. Set GROQ_API_KEY in .env file")
+client = Groq(api_key=api_key)
 
 
 class CouncilAgent:
@@ -43,15 +46,9 @@ class CouncilAgent:
     """
     
     def __init__(self, model_name: str = LLM_MODEL):
-        """Initialize Council Agent with Gemini model"""
-        self.model = genai.GenerativeModel(
-            model_name=model_name,
-            generation_config={
-                "temperature": LLM_TEMPERATURE,
-                "max_output_tokens": MAX_OUTPUT_TOKENS,
-                "response_mime_type": "application/json"
-            }
-        )
+        """Initialize Council Agent with Groq Llama model"""
+        self.model_name = model_name
+        self.client = client
         self.decisions: List[AgentDecision] = []
         self.metrics: Optional[PerformanceMetrics] = None
         
@@ -314,6 +311,7 @@ Example decision structure:
 {{
   "pattern_detected": "HDFC Rewards >₹5,000 failing during 14:00-16:00 window",
   "affected_volume": 47,
+  "avg_amount": 7842.50,
   "cost_analysis": "Reroute cost: ₹705 (47 × ₹15). Revenue saved: ₹7,332 (47 × ₹156 avg margin). Net: +₹6,627",
   "temporal_signal": "stable",
   "risk_category": "payment_failure",
@@ -346,14 +344,29 @@ Return a JSON array of decisions following the format specified in the system pr
         # Combine into single prompt
         full_prompt = system_prompt + "\n\n" + user_message
         
-        # Call Gemini with retry logic
+        # Call Groq with retry logic
         max_retries = 2
         for attempt in range(max_retries + 1):
             try:
-                response = self.model.generate_content(full_prompt)
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": system_prompt
+                        },
+                        {
+                            "role": "user",
+                            "content": user_message
+                        }
+                    ],
+                    temperature=LLM_TEMPERATURE,
+                    max_tokens=MAX_OUTPUT_TOKENS,
+                    response_format={"type": "json_object"}
+                )
                 
                 # Parse JSON response
-                response_text = response.text.strip()
+                response_text = response.choices[0].message.content.strip()
                 
                 # Handle markdown code blocks if present
                 if response_text.startswith("```json"):
@@ -361,11 +374,18 @@ Return a JSON array of decisions following the format specified in the system pr
                 elif response_text.startswith("```"):
                     response_text = response_text.split("```")[1].split("```")[0].strip()
                 
-                decisions = json.loads(response_text)
+                # Parse the JSON response
+                response_data = json.loads(response_text)
                 
-                # Ensure it's an array
-                if isinstance(decisions, dict):
-                    decisions = [decisions]
+                # Handle both wrapped and unwrapped arrays
+                if "decisions" in response_data:
+                    decisions = response_data["decisions"]
+                elif isinstance(response_data, list):
+                    decisions = response_data
+                elif isinstance(response_data, dict):
+                    decisions = [response_data]
+                else:
+                    decisions = response_data
                 
                 return decisions
                 
