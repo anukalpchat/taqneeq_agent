@@ -80,6 +80,34 @@ class CouncilAgent:
         top_clusters = self._rank_clusters(clusters)
         print(f"   ✓ Ranked by impact, selected top {len(top_clusters)} for analysis")
         
+        # Handle edge case: no clusters found
+        if len(top_clusters) == 0:
+            print("\n⚠️  No significant patterns found (all clusters below MIN_PATTERN_SIZE).")
+            return {
+                "decisions": [],
+                "metrics": PerformanceMetrics(
+                    total_transactions=len(df),
+                    total_failures=len(failures),
+                    reroutes_executed=0,
+                    reroutes_ignored=0,
+                    alerts_raised=0,
+                    total_cost=0.0,
+                    total_revenue_saved=0.0,
+                    net_profit=0.0,
+                    patterns_discovered=0,
+                    decision_accuracy=0.0
+                ),
+                "metadata": {
+                    "timestamp": datetime.now().isoformat(),
+                    "model_used": LLM_MODEL,
+                    "inference_time_seconds": round(time.time() - start_time, 2),
+                    "total_decisions": 0
+                }
+            }
+        
+        # Store clusters for accurate profit calculations
+        self.analyzed_clusters = top_clusters
+        
         print(f"\n🧠 Analyzing patterns with {LLM_MODEL}...")
         decisions = self._analyze_with_llm(top_clusters)
         print(f"   ✓ LLM call completed ({time.time() - start_time:.1f}s)")
@@ -103,7 +131,13 @@ class CouncilAgent:
     
     def _load_transactions(self, path: str) -> pd.DataFrame:
         """Load and validate transaction data"""
-        with open(path, 'r') as f:
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                f"Transactions file not found: {path}\n"
+                f"Run chaos_engine.py first to generate synthetic data."
+            )
+        
+        with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
         
         # Convert to DataFrame
@@ -133,7 +167,7 @@ class CouncilAgent:
         clusters = []
         
         # Add hour column for temporal grouping
-        failures['hour'] = failures['timestamp'].dt.hour
+        failures['hour'] = failures['timestamp'].dt.hour  # type: ignore
         
         # Define amount buckets
         def get_amount_bucket(amount):
@@ -151,7 +185,8 @@ class CouncilAgent:
         # Group by multiple dimensions
         grouping_keys = ['bank', 'card_type', 'amount_bucket']
         
-        for group_key, group_df in failures.groupby(grouping_keys):
+        # Sort to ensure deterministic ordering
+        for group_key, group_df in failures.groupby(grouping_keys, sort=True):
             if len(group_df) < MIN_PATTERN_SIZE:
                 continue  # Skip small clusters
             
@@ -186,9 +221,7 @@ class CouncilAgent:
                 avg_amount=float(group_df['amount'].mean()),
                 failure_rate=failure_rate,
                 time_window=time_window,
-                error_codes=error_codes,
-                merchant_category=group_df['merchant_category'].mode()[0] if len(group_df) > 0 else "unknown",
-                customer_tier=group_df['customer_tier'].mode()[0] if len(group_df) > 0 else "unknown"
+                error_codes=error_codes
             )
             
             clusters.append(cluster)
@@ -200,11 +233,15 @@ class CouncilAgent:
         Rank clusters by business impact (count × avg_amount)
         Keep top N for LLM analysis
         """
-        # Calculate impact score
+        # Calculate impact score with stable secondary keys for deterministic ordering
         ranked = sorted(
             clusters,
-            key=lambda c: c.count * c.avg_amount,
-            reverse=True
+            key=lambda c: (
+                -(c.count * c.avg_amount),  # Primary: impact (descending)
+                c.bank,                      # Secondary: alphabetical
+                c.card_type,                 # Tertiary: alphabetical
+                c.amount_range               # Quaternary: alphabetical
+            )
         )
         
         return ranked[:max_clusters]
@@ -520,13 +557,18 @@ Return a JSON array of decisions following the format specified in the system pr
                             "content": user_message
                         }
                     ],
-                    temperature=LLM_TEMPERATURE,
+                    temperature=0,  # Minimizes randomness (but not completely deterministic)
                     max_tokens=MAX_OUTPUT_TOKENS,
                     response_format={"type": "json_object"}
+                    # Note: Even with temperature=0, LLM APIs may have slight non-determinism
+                    # due to distributed infrastructure, floating-point ops, and sampling
                 )
                 
                 # Parse JSON response
-                response_text = response.choices[0].message.content.strip()
+                response_text = response.choices[0].message.content
+                if not response_text:
+                    raise ValueError("Empty response from LLM")
+                response_text = response_text.strip()
                 
                 # Handle markdown code blocks if present
                 if response_text.startswith("```json"):
@@ -553,18 +595,22 @@ Return a JSON array of decisions following the format specified in the system pr
                 print(f"   ⚠️  Attempt {attempt + 1} failed: {str(e)}")
                 if attempt == max_retries:
                     print("   ❌ All retries exhausted. Returning fallback decision.")
-                    # Return safe fallback
+                    # Return safe fallback (will fail validation but won't crash)
                     return [{
-                        "pattern_detected": "LLM analysis failed",
-                        "affected_volume": 0,
-                        "cost_analysis": "Unable to calculate",
+                        "pattern_detected": "LLM analysis failed - technical error",
+                        "affected_volume": 1,
+                        "avg_amount": 0.01,
+                        "cost_analysis": "Unable to calculate due to API failure or rate limit exceeded",
                         "temporal_signal": "stable",
                         "risk_category": "payment_failure",
                         "decision": "IGNORE",
-                        "reasoning": "Council unable to analyze pattern due to technical error. Defaulting to IGNORE to preserve capital.",
+                        "reasoning": "Council unable to analyze pattern due to technical error (API failure, rate limit, or network issue). Defaulting to IGNORE to preserve capital and avoid risky decisions without proper analysis.",
                         "confidence": 0.0
                     }]
                 time.sleep(2)  # Wait before retry
+        
+        # Should never reach here due to return in except block
+        return []
     
     def _validate_decisions(self, decisions: List[Dict[str, Any]]) -> List[AgentDecision]:
         """
@@ -577,11 +623,11 @@ Return a JSON array of decisions following the format specified in the system pr
                 decision = AgentDecision(**decision_dict)
                 valid_decisions.append(decision)
             except Exception as e:
-                print(f"   ⚠️  Decision {i+1} failed validation: {str(e)}")
+                print(f"   ⚠️  Decision {i+1} failed validation: {str(e)[:200]}")
                 # Skip invalid decisions
         
         if len(valid_decisions) == 0:
-            print("   ❌ No valid decisions! Check LLM output format.")
+            print("   ❌ No valid decisions! All LLM outputs failed validation.")
         
         return valid_decisions
     
@@ -592,15 +638,32 @@ Return a JSON array of decisions following the format specified in the system pr
         total_failures: int
     ) -> PerformanceMetrics:
         """
-        Calculate aggregate performance metrics
+        Calculate aggregate performance metrics using actual cluster data
+        (not LLM-generated values which may be rounded/modified)
         """
         reroutes = [d for d in decisions if d.decision == "REROUTE"]
         ignores = [d for d in decisions if d.decision == "IGNORE"]
         alerts = [d for d in decisions if d.decision == "ALERT"]
         
-        # Calculate costs and revenues
-        total_cost = sum(d.affected_volume * REROUTE_COST for d in reroutes)
-        total_revenue = sum(d.affected_volume * d.avg_amount * MARGIN_RATE for d in reroutes)
+        # Match decisions to original clusters for accurate calculations
+        total_cost = 0.0
+        total_revenue = 0.0
+        
+        for decision in reroutes:
+            # Find matching cluster by pattern similarity
+            matched_cluster = self._find_matching_cluster(decision)
+            
+            if matched_cluster:
+                # Use actual cluster data for calculations
+                cost = matched_cluster.count * REROUTE_COST
+                revenue = matched_cluster.count * matched_cluster.avg_amount * MARGIN_RATE
+                total_cost += cost
+                total_revenue += revenue
+            else:
+                # Fallback to LLM values if no cluster match (shouldn't happen)
+                total_cost += decision.affected_volume * REROUTE_COST
+                total_revenue += decision.affected_volume * decision.avg_amount * MARGIN_RATE
+        
         net_profit = total_revenue - total_cost
         
         # Count patterns
@@ -621,6 +684,30 @@ Return a JSON array of decisions following the format specified in the system pr
             patterns_discovered=patterns_discovered,
             decision_accuracy=decision_accuracy
         )
+    
+    def _find_matching_cluster(self, decision: AgentDecision) -> Optional[FailureCluster]:
+        """
+        Match a decision back to its original cluster by pattern similarity.
+        Uses fuzzy matching on bank, card_type, and amount_range.
+        """
+        if not hasattr(self, 'analyzed_clusters'):
+            return None
+        
+        pattern_lower = decision.pattern_detected.lower()
+        
+        for cluster in self.analyzed_clusters:
+            # Check if cluster attributes appear in pattern description
+            bank_match = cluster.bank.lower() in pattern_lower
+            card_match = cluster.card_type.lower() in pattern_lower
+            amount_match = cluster.amount_range.lower() in pattern_lower or \
+                          cluster.amount_range.replace('<', '').replace('>', '') in pattern_lower
+            
+            # Match if at least 2 of 3 key attributes are present
+            matches = sum([bank_match, card_match, amount_match])
+            if matches >= 2:
+                return cluster
+        
+        return None
     
     def _save_results(
         self,
@@ -654,7 +741,7 @@ Return a JSON array of decisions following the format specified in the system pr
 
 def main():
     """
-    Main execution function
+    Main execution function with error handling
     """
     print("=" * 60)
     print("SENTINEL COUNCIL AGENT - The Strategist")
@@ -662,19 +749,35 @@ def main():
     print("=" * 60)
     print()
     
-    agent = CouncilAgent()
-    results = agent.analyze_failures()
+    try:
+        agent = CouncilAgent()
+        results = agent.analyze_failures()
+        
+        print("\n" + "=" * 60)
+        print("ANALYSIS COMPLETE")
+        print("=" * 60)
+        print(f"\n📊 Summary:")
+        print(f"   Decisions Made: {results['metadata']['total_decisions']}")
+        print(f"   Inference Time: {results['metadata']['inference_time_seconds']}s")
+        print(f"   Net Profit: ₹{results['metrics']['net_profit']:,.2f}")
+        print(f"   Patterns Found: {results['metrics']['patterns_discovered']}")
+        print(f"\n💾 Results saved to: data/decisions.json")
+        
+    except FileNotFoundError as e:
+        print(f"\n❌ Error: {e}")
+        return 1
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Interrupted by user")
+        return 130
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
     
-    print("\n" + "=" * 60)
-    print("ANALYSIS COMPLETE")
-    print("=" * 60)
-    print(f"\n📊 Summary:")
-    print(f"   Decisions Made: {results['metadata']['total_decisions']}")
-    print(f"   Inference Time: {results['metadata']['inference_time_seconds']}s")
-    print(f"   Net Profit: ₹{results['metrics']['net_profit']:,.2f}")
-    print(f"   Patterns Found: {results['metrics']['patterns_discovered']}")
-    print(f"\n💾 Results saved to: data/decisions.json")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    sys.exit(main())
