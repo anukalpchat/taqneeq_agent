@@ -1,1 +1,46 @@
+# Python environments
 /venv
+venv/
+env/
+ENV/
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Pydantic/Pydantic cache
+.pydantic_cache/
+
+# Environment variables (contains API keys!)
+.env
+.env.local
+
+
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Pytest cache
+.pytest_cache/
+
+# MyPy type checking cache
+.mypy_cache/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
