@@ -1,110 +1,143 @@
 {
   "metadata": {
-    "timestamp": "2026-02-01T00:51:00.541120",
+    "timestamp": "2026-02-01T01:34:16.885811",
     "model_used": "llama-3.3-70b-versatile",
-    "inference_time_seconds": 4.69,
-    "total_decisions": 8
+    "inference_time_seconds": 4.35,
+    "total_decisions": 11
   },
   "decisions": [
     {
-      "pattern_detected": "HDFC Rewards >\u20b95,000 failing during 14:00-16:00 window",
+      "pattern_detected": "HDFC Rewards >5000 failing 14:00-16:00",
       "affected_volume": 35,
       "avg_amount": 8659.805714285716,
-      "cost_analysis": "Reroute cost: \u20b9525 (35 \u00d7 \u20b915). Revenue saved: \u20b96,050.50 (35 \u00d7 \u20b9173 avg margin). Net: +\u20b95,525.50",
+      "cost_analysis": "Reroute cost: ₹525 (35×₹15). Revenue saved: ₹2,821.55 (35×₹80.62 avg margin). Net: +₹2,296.55",
       "temporal_signal": "stable",
       "decision": "REROUTE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: High-value segment with \u20b9173 average margin creates \u20b95,525.50 net profit opportunity. CTO perspective: Error pattern (RISK_THRESHOLD_EXCEEDED) indicates policy issue, not infrastructure - rerouting will succeed. Risk Manager: Transaction amounts and customer tier do not indicate fraud. UNANIMOUS DECISION: Reroute to Axis Bank for immediate recovery.",
-      "confidence": 0.94
+      "reasoning": "CFO perspective: Calculates ₹2,296.55 net benefit. CTO perspective: 92.1% failure rate affecting VIP customers for 2 hours violates our 99.5% SLA commitment. Pattern stability indicates systemic HDFC issue, making reroute to Razorpay likely to succeed. Moderator synthesis: Unanimous decision—both financial profitability and operational reliability perspectives strongly align.",
+      "confidence": 0.95
     },
     {
-      "pattern_detected": "ICICI Debit \u20b91,000-\u20b95,000 failing during 01:00-20:00 window",
+      "pattern_detected": "ICICI Debit 1000-5000 failing 01:00-20:00",
       "affected_volume": 16,
       "avg_amount": 1840.615625,
-      "cost_analysis": "Reroute cost: \u20b9240 (16 \u00d7 \u20b915). Revenue saved: \u20b9294.24 (16 \u00d7 \u20b918.4 avg margin). Net: +\u20b954.24",
+      "cost_analysis": "Reroute cost: ₹240 (16×₹15). Revenue saved: ₹442.56 (16×₹27.66 avg margin). Net: +₹202.56",
       "temporal_signal": "stable",
-      "decision": "IGNORE",
+      "decision": "REROUTE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b918.4 average margin creates \u20b954.24 net profit opportunity, but not enough to justify intervention. CTO perspective: Error pattern (SERVICE_UNAVAILABLE) indicates infrastructure issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.6
+      "reasoning": "CFO perspective: Calculates ₹202.56 net benefit. CTO perspective: 26.2% failure rate is moderate but stable pattern indicates systemic issue. Moderator synthesis: Both perspectives agree on REROUTE.",
+      "confidence": 0.75
     },
     {
-      "pattern_detected": "HDFC Rewards \u20b91,000-\u20b95,000 failing during 01:00-13:00 window",
+      "pattern_detected": "HDFC Rewards 1000-5000 failing 01:00-13:00",
       "affected_volume": 13,
       "avg_amount": 2089.3653846153848,
-      "cost_analysis": "Reroute cost: \u20b9195 (13 \u00d7 \u20b915). Revenue saved: \u20b9208.96 (13 \u00d7 \u20b916.08 avg margin). Net: +\u20b913.96",
+      "cost_analysis": "Reroute cost: ₹195 (13×₹15). Revenue saved: ₹245.19 (13×₹18.86 avg margin). Net: +₹50.19",
+      "temporal_signal": "stable",
+      "decision": "REROUTE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Calculates ₹50.19 net benefit. CTO perspective: 22.4% failure rate is moderate but stable pattern indicates systemic issue. Moderator synthesis: Both perspectives agree on REROUTE.",
+      "confidence": 0.65
+    },
+    {
+      "pattern_detected": "ICICI Debit 100-1000 failing 18:00-20:00",
+      "affected_volume": 40,
+      "avg_amount": 554.63125,
+      "cost_analysis": "Reroute cost: ₹600 (40×₹15). Revenue saved: ₹221.05 (40×₹5.51 avg margin). Net: -₹378.95",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b916.08 average margin creates \u20b913.96 net profit opportunity, but not enough to justify intervention. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.55
+      "reasoning": "CFO perspective: Calculates -₹378.95 net loss. CTO perspective: 39.2% failure rate is moderate but low customer impact. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.85
     },
     {
-      "pattern_detected": "Kotak Corporate \u20b9100-\u20b91,000 failing during 08:00-10:00 window",
+      "pattern_detected": "Kotak Corporate 100-1000 failing 08:00-10:00",
       "affected_volume": 14,
       "avg_amount": 630.445,
-      "cost_analysis": "Reroute cost: \u20b9210 (14 \u00d7 \u20b915). Revenue saved: \u20b9140.84 (14 \u00d7 \u20b910.06 avg margin). Net: -\u20b969.16",
+      "cost_analysis": "Reroute cost: ₹210 (14×₹15). Revenue saved: ₹88.29 (14×₹6.31 avg margin). Net: -₹121.71",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b910.06 average margin creates -\u20b969.16 net loss. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.5
+      "reasoning": "CFO perspective: Calculates -₹121.71 net loss. CTO perspective: 21.9% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
     },
     {
-      "pattern_detected": "Kotak Debit \u20b9100-\u20b91,000 failing during 17:00-20:00 window",
+      "pattern_detected": "Kotak Debit 100-1000 failing 17:00-20:00",
       "affected_volume": 15,
       "avg_amount": 570.1046666666666,
-      "cost_analysis": "Reroute cost: \u20b9225 (15 \u00d7 \u20b915). Revenue saved: \u20b9151.2 (15 \u00d7 \u20b910.08 avg margin). Net: -\u20b973.8",
+      "cost_analysis": "Reroute cost: ₹225 (15×₹15). Revenue saved: ₹85.56 (15×₹5.7 avg margin). Net: -₹139.44",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b910.08 average margin creates -\u20b973.8 net loss. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.5
+      "reasoning": "CFO perspective: Calculates -₹139.44 net loss. CTO perspective: 19.5% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
     },
     {
-      "pattern_detected": "SBI Corporate \u20b9100-\u20b91,000 failing during 18:00-24:00 window",
+      "pattern_detected": "SBI Corporate 100-1000 failing 18:00-24:00",
       "affected_volume": 14,
       "avg_amount": 545.4907142857143,
-      "cost_analysis": "Reroute cost: \u20b9210 (14 \u00d7 \u20b915). Revenue saved: \u20b9108.8 (14 \u00d7 \u20b97.77 avg margin). Net: -\u20b9101.2",
+      "cost_analysis": "Reroute cost: ₹210 (14×₹15). Revenue saved: ₹81.93 (14×₹5.85 avg margin). Net: -₹128.07",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b97.77 average margin creates -\u20b9101.2 net loss. CTO perspective: Error pattern (DAILY_LIMIT_REACHED) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.45
+      "reasoning": "CFO perspective: Calculates -₹128.07 net loss. CTO perspective: 21.2% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
     },
     {
-      "pattern_detected": "ICICI Credit \u20b9100-\u20b91,000 failing during 05:00-16:00 window",
+      "pattern_detected": "ICICI Credit 100-1000 failing 05:00-16:00",
       "affected_volume": 12,
       "avg_amount": 572.6008333333333,
-      "cost_analysis": "Reroute cost: \u20b9180 (12 \u00d7 \u20b915). Revenue saved: \u20b996 (12 \u00d7 \u20b98 avg margin). Net: -\u20b984",
+      "cost_analysis": "Reroute cost: ₹180 (12×₹15). Revenue saved: ₹68.55 (12×₹5.71 avg margin). Net: -₹111.45",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b98 average margin creates -\u20b984 net loss. CTO perspective: Error pattern (FRAUD_CHECK_TIMEOUT) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.4
+      "reasoning": "CFO perspective: Calculates -₹111.45 net loss. CTO perspective: 17.4% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
     },
     {
-      "pattern_detected": "Kotak Rewards \u20b9100-\u20b91,000 failing during 11:00-19:00 window",
+      "pattern_detected": "Kotak Rewards 100-1000 failing 11:00-19:00",
       "affected_volume": 11,
       "avg_amount": 584.8890909090909,
-      "cost_analysis": "Reroute cost: \u20b9165 (11 \u00d7 \u20b915). Revenue saved: \u20b987.12 (11 \u00d7 \u20b97.92 avg margin). Net: -\u20b977.88",
+      "cost_analysis": "Reroute cost: ₹165 (11×₹15). Revenue saved: ₹64.33 (11×₹5.85 avg margin). Net: -₹100.67",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Low-value segment with \u20b97.92 average margin creates -\u20b977.88 net loss. CTO perspective: Error pattern (SUSPICIOUS_ACTIVITY) indicates policy issue, but not critical. Risk Manager: Transaction amounts and customer tier do not indicate fraud. DECISION: Ignore and monitor for now.",
-      "confidence": 0.4
+      "reasoning": "CFO perspective: Calculates -₹100.67 net loss. CTO perspective: 16.2% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
+    },
+    {
+      "pattern_detected": "SBI Debit 100-1000 failing 05:00-07:00",
+      "affected_volume": 11,
+      "avg_amount": 575.4790909090909,
+      "cost_analysis": "Reroute cost: ₹165 (11×₹15). Revenue saved: ₹63.89 (11×₹5.81 avg margin). Net: -₹101.11",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Calculates -₹101.11 net loss. CTO perspective: 15.9% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
+    },
+    {
+      "pattern_detected": "ICICI Corporate 100-1000 failing 01:00-04:00",
+      "affected_volume": 12,
+      "avg_amount": 491.82666666666665,
+      "cost_analysis": "Reroute cost: ₹180 (12×₹15). Revenue saved: ₹58.93 (12×₹4.91 avg margin). Net: -₹121.07",
+      "temporal_signal": "stable",
+      "decision": "IGNORE",
+      "risk_category": "payment_failure",
+      "reasoning": "CFO perspective: Calculates -₹121.07 net loss. CTO perspective: 17.1% failure rate is low. Moderator synthesis: Both perspectives agree on IGNORE.",
+      "confidence": 0.8
     }
   ],
   "metrics": {
     "total_transactions": 2500,
     "total_failures": 459,
-    "reroutes_executed": 1,
-    "reroutes_ignored": 7,
+    "reroutes_executed": 3,
+    "reroutes_ignored": 8,
     "alerts_raised": 0,
-    "total_cost": 525.0,
-    "total_revenue_saved": 6061.864000000001,
-    "net_profit": 5536.864000000001,
-    "patterns_discovered": 8,
+    "total_cost": 960.0,
+    "total_revenue_saved": 7194.096000000001,
+    "net_profit": 6234.096000000001,
+    "patterns_discovered": 11,
     "decision_accuracy": 0.85
   }
 }
