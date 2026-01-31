@@ -159,9 +159,9 @@ PATTERNS = {
 # LLM CONFIGURATION
 # ============================================================================
 
-LLM_MODEL = "gpt-4o-mini"               # Use gpt-4o-mini for cost efficiency, or gpt-4o for best quality
+LLM_MODEL = "gemini-1.5-flash"          # Gemini 1.5 Flash (fallback with separate quota)
 LLM_TEMPERATURE = 0.1                   # Low temperature for deterministic reasoning
-MAX_TOKENS = 2000
+MAX_OUTPUT_TOKENS = 2000                # Maximum tokens for LLM response
 LLM_TIMEOUT_SECONDS = 30
 MAX_RETRIES = 2
 

@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "timestamp": "2026-02-01T00:29:19.155198",
+    "model_used": "gemini-1.5-flash",
+    "inference_time_seconds": 4.61,
+    "total_decisions": 0
+  },
+  "decisions": [],
+  "metrics": {
+    "total_transactions": 2500,
+    "total_failures": 459,
+    "reroutes_executed": 0,
+    "reroutes_ignored": 0,
+    "alerts_raised": 0,
+    "total_cost": 0.0,
+    "total_revenue_saved": 0.0,
+    "net_profit": 0.0,
+    "patterns_discovered": 0,
+    "decision_accuracy": 0.85
+  }
+}

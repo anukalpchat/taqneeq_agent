@@ -1188,16 +1188,168 @@ Judges see the dashboard for 3 minutes. It must immediately communicate:
 
 **Critical element**: Large callout showing ₹ saved
 
-#### Component 6.6: (Optional) Live Transaction Feed
-**If time permits**: Scrolling list of recent transactions with status
+#### Component 6.6: Live Bank Status Monitor ⭐ **CRITICAL FOR DEMO**
+**Purpose**: Show real-time health of each payment provider
+
+**Must display** (4 columns, one per bank):
+- **Bank name**: HDFC, SBI, ICICI, Axis
+- **Success rate**: 98% (color-coded: 🟢 >90%, 🟡 70-90%, 🔴 <70%)
+- **Transaction throughput**: "347 TPS" (transactions per second)
+- **Latency**: "245ms" (response time)
+- **Status indicator**: Visual dot showing health
+
+**Visual design**:
+```
+┌──────────┐
+│   HDFC   │
+│  🟢 98%  │  ← Big number, color changes
+│  347 TPS │  ← Real-time counter
+│ ⚡ 245ms  │  ← Lightning bolt + latency
+└──────────┘
+```
+
+**Update frequency**: Every 1 second (use `st.empty()` containers)
+
+**Demo value**: Judges WATCH banks turn red when patterns emerge, then recover when agent reroutes
+
+---
+
+#### Component 6.7: Live Transaction Feed ⭐ **THE WOW FACTOR**
+**Purpose**: Show transactions being processed and rerouted in real-time
+
+**Must display**:
+- **Scrolling log** of last 15 transactions (newest at top)
+- **Transaction details**: ID, original bank, amount, outcome
+- **Reroute visualization**: "HDFC → Axis" with arrow animation
+- **Status badges**: ✅ SUCCESS, ❌ FAILED, ⚙️ REROUTING, 🚫 IGNORED
+
+**Entry format**:
+```
+14:32:15 TXN04523 HDFC→AXIS ₹7,842 ✅ REROUTED (saved ₹141)
+14:32:14 TXN04522 HDFC→AXIS ₹9,234 ✅ REROUTED (saved ₹169)
+14:32:13 TXN04521 SBI ₹42 🚫 IGNORED (unprofitable)
+14:32:11 🚨 ALERT: HDFC Rewards pattern detected!
+14:32:10 TXN04520 ICICI ₹1,234 ✅ SUCCESS
+```
+
+**Visual effects**:
+- New entries **fade in** from top
+- Rerouted transactions **pulse green** for 2 seconds
+- Ignored transactions show **red strikethrough**
+- Pattern alerts show **yellow background** with 🚨 icon
+
+**Demo value**: Judges see LIVE proof that agent is taking actions, not just recommending
+
+---
+
+#### Component 6.8: Agent Action Theater ⭐ **THE EXPLAINER**
+**Purpose**: Show Council → Executor decision flow in real-time
+
+**Layout** (2 sections side-by-side):
+
+**Left: Council Reasoning**
+```
+┌─────────────────────────────────┐
+│ 🧠 COUNCIL AGENT                │
+├─────────────────────────────────┤
+│ Pattern: HDFC Rewards >₹5K      │
+│ Affected: 47 transactions       │
+│ Cost: ₹705 | Revenue: ₹7,332    │
+│ Net: +₹6,627                    │
+│                                 │
+│ Decision: REROUTE               │
+│ Confidence: 94%                 │
+│                                 │
+│ Reasoning: High-value Rewards   │
+│ card segment showing 98%        │
+│ failure rate...                 │
+└─────────────────────────────────┘
+```
+
+**Right: Executor Actions**
+```
+┌─────────────────────────────────┐
+│ ⚙️ EXECUTOR AGENT               │
+├─────────────────────────────────┤
+│ ✅ Validating decision...       │
+│ ✅ Confidence check: PASS       │
+│ ✅ Net benefit check: PASS      │
+│ ✅ Capacity check: PASS         │
+│                                 │
+│ 🔄 Executing reroute...         │
+│ ├─ Target: Axis Bank            │
+│ ├─ Transactions: 47             │
+│ └─ Status: 45/47 SUCCESS (96%)  │
+│                                 │
+│ ✅ EXECUTION COMPLETE           │
+│ Saved: ₹6,627                   │
+└─────────────────────────────────┘
+```
+
+**Update flow**:
+1. Council section populates (shows LLM reasoning)
+2. Executor section shows validation checks (one by one, with delays)
+3. Executor section shows execution progress bar
+4. Final success message with savings
+
+**Demo value**: Shows the AI "thinking" and the agent "acting" - full transparency
+
+---
+
+#### Component 6.9: Simulation Controller
+**Purpose**: Control demo playback for presentation
+
+**Controls**:
+- ▶️ **Play button**: Start processing transactions
+- ⏸️ **Pause button**: Freeze at current state
+- ⏭️ **Skip to pattern**: Jump to next interesting event
+- 🔄 **Reset**: Reload data and restart
+- **Speed slider**: 1x, 2x, 5x, 10x (for demo rehearsal)
+
+**Auto-pause triggers**:
+- When major pattern detected (give time to explain)
+- When agent executes action (show the moment)
+- When metrics update significantly
+
+**Demo value**: Control the narrative - pause at key moments to explain to judges
+
+---
+
+#### Component 6.10: Side-by-Side Comparison (Enhanced)
+**Purpose**: Show before/after with LIVE updates
+
+**Layout**:
+```
+┌──────────────────┬──────────────────┐
+│  Naive System    │   SENTINEL       │
+├──────────────────┼──────────────────┤
+│ Reroutes: 200    │ Reroutes: 47     │ ← Updates live
+│ Cost: ₹3,000     │ Cost: ₹705       │ ← Counter animates
+│ Net: -₹2,200 🔴  │ Net: +₹6,627 🟢  │ ← Big number, colored
+└──────────────────┴──────────────────┘
+```
+
+**Visual effects**:
+- Numbers **count up** as transactions process
+- Net profit turns **green** when positive
+- Sparkline charts show trend over time
+- **Final reveal**: Total savings number explodes on screen
+
+**Demo value**: Judges see gap widening in real-time - immediate proof of superiority
+
+---
 
 ### CHECKPOINT 6: Validation
 
 **What to check**:
 ✅ Dashboard runs: `streamlit run dashboard.py`  
 ✅ All metrics display correctly  
-✅ 3 pattern cards visible and properly formatted  
+✅ Live bank monitor showing 4 banks with real-time stats  
+✅ Transaction feed scrolling with reroute animations  
+✅ Agent Action Theater showing Council + Executor flow  
+✅ Pattern cards visible and properly formatted  
 ✅ Comparison chart shows clear advantage  
+✅ Simulation controls work (Play/Pause/Reset)  
 ✅ No errors in console  
 ✅ Looks professional (not cluttered)  
 
@@ -1206,13 +1358,204 @@ Judges see the dashboard for 3 minutes. It must immediately communicate:
 "Step 6 complete. Screenshot of dashboard:
 [PASTE SCREENSHOT OR DESCRIBE LAYOUT]
 
+Live demo features:
+[DESCRIBE BANK MONITOR, TRANSACTION FEED, ACTION THEATER]
+
 Questions:
-1. Is the story clear at a glance?
-2. Too cluttered or too sparse?
-3. Any UI improvements?"
+1. Is the live simulation smooth and compelling?
+2. Can judges SEE the agent taking actions?
+3. Too cluttered or too sparse?
+4. Any UI improvements?"
 ```
 
 ---
+
+## STEP 6.5: DEMO CHOREOGRAPHY ⭐ **THE WINNING STRATEGY**
+
+### The 3-Minute Pitch That Wins
+
+#### Pre-Demo Setup (30 seconds before judges arrive)
+1. Load dashboard with simulation PAUSED at interesting moment
+2. Have 4 banks showing (HDFC at 35% success rate - red)
+3. Transaction feed showing recent failures
+4. Council Agent box showing pattern detection in progress
+5. **Position**: "This is what's happening RIGHT NOW..."
+
+---
+
+#### Act 1: The Problem (0:00 - 0:45)
+
+**What judges see**:
+- Static comparison chart: "Naive systems lose ₹2,250"
+- Explain: "Competitors blindly retry everything. We're different."
+
+**What you say**:
+> "Most payment systems waste money fixing failures that aren't worth fixing.  
+> Let me show you our AI making intelligent decisions in real-time."
+
+**Action**: Click ▶️ Play button
+
+---
+
+#### Act 2: Pattern Detection (0:45 - 1:30) ⭐ **THE HOOK**
+
+**What judges see**:
+1. Transactions flowing through feed
+2. **HDFC bank turns red** (success rate: 98% → 35%)
+3. **🚨 Alert appears**: "HDFC Rewards pattern detected"
+4. **Council Agent box populates**:
+   ```
+   Pattern: HDFC Rewards >₹5K @ 14:00-16:00
+   Affected: 47 transactions
+   Cost Analysis: Net benefit +₹6,627
+   Decision: REROUTE
+   Confidence: 94%
+   ```
+
+**What you say** (while pointing at screen):
+> "Watch this. HDFC just started failing for high-value Rewards cards.  
+> Our AI Council detected it instantly - 47 transactions, ₹6,627 potential savings.  
+> But here's the key: we don't just recommend. We execute."
+
+**Action**: Pause for 3 seconds (let judges absorb the Council reasoning)
+
+---
+
+#### Act 3: Agent Takes Action (1:30 - 2:15) ⭐ **THE WOW MOMENT**
+
+**What judges see**:
+1. **Executor Agent box activates**:
+   ```
+   ✅ Validating decision...
+   ✅ Confidence check: PASS (94% > 70%)
+   ✅ Net benefit check: PASS (+₹6,627 > 0)
+   ✅ Capacity check: PASS (Axis Bank available)
+   
+   🔄 Executing reroute...
+   ├─ Target: Axis Bank
+   ├─ Transactions: 47
+   └─ Status: [████████░░] 45/47 SUCCESS
+   ```
+
+2. **Transaction feed shows live reroutes**:
+   ```
+   14:32:15 TXN04523 HDFC→AXIS ₹7,842 ✅ REROUTED
+   14:32:14 TXN04522 HDFC→AXIS ₹9,234 ✅ REROUTED
+   14:32:13 TXN04521 HDFC→AXIS ₹6,123 ✅ REROUTED
+   ```
+
+3. **Bank columns update**:
+   - HDFC: Traffic decreases (347 TPS → 290 TPS)
+   - Axis: Traffic increases (289 TPS → 346 TPS)
+
+4. **Metrics counter animates**:
+   - Net profit: ₹0 → ₹6,627 (green, counting up)
+
+**What you say** (pointing at screen excitedly):
+> "There! The agent just rerouted 47 transactions to Axis Bank.  
+> Watch the transaction feed - you can SEE each one succeeding.  
+> And look at the bank columns - traffic shifted in real-time.  
+> 45 out of 47 recovered. That's ₹6,627 saved in 10 seconds."
+
+**Action**: Let simulation run for 5 more seconds (show more patterns if time)
+
+---
+
+#### Act 4: The Proof (2:15 - 2:45)
+
+**What judges see**:
+- Click on "SBI Micro-transactions" pattern card
+- Shows Council decided: **IGNORE** (negative margin)
+- Transaction feed shows:
+  ```
+  14:32:20 TXN04530 SBI ₹42 🚫 IGNORED (unprofitable)
+  ```
+
+**What you say**:
+> "But here's what makes us smart: We also IGNORE unprofitable fixes.  
+> These SBI micro-transactions? Margin is ₹0.84, reroute costs ₹15.  
+> Our AI said 'Let it fail' - saved ₹1,651 by NOT wasting money."
+
+**Action**: Point at comparison chart
+
+---
+
+#### Act 5: The Knockout (2:45 - 3:00)
+
+**What judges see**:
+- Side-by-side comparison updating live
+- Final numbers reveal:
+  ```
+  Naive System    │   SENTINEL
+  ────────────────┼──────────────
+  Reroutes: 200   │ Reroutes: 47
+  Cost: ₹3,000    │ Cost: ₹705
+  Net: -₹2,200 🔴 │ Net: +₹6,627 🟢
+  
+  SENTINEL is 400% MORE PROFITABLE
+  ```
+
+**What you say** (final punch):
+> "In 3 minutes, you watched our agent:
+> 1. Detect patterns competitors would miss
+> 2. Calculate profit in real-time
+> 3. Execute actions autonomously
+> 4. Turn a ₹2,200 loss into a ₹6,627 profit.
+> 
+> That's not a chatbot. That's agentic AI."
+
+**Action**: Pause simulation, show `execution_log.json` if judges ask for proof
+
+---
+
+### Backup Demo Moments (If Judges Interrupt)
+
+**If they ask**: "How do you know the agent actually did something?"
+**Response**: 
+- Open `execution_log.json` → Show timestamped reroutes
+- Open email inbox → Show alert emails that arrived during demo
+- Show `decisions.json` → Full audit trail with reasoning
+
+**If they ask**: "What if the LLM is wrong?"
+**Response**:
+- Point to Executor validation checks
+- Show SafetyOverride section: "If confidence < 70%, agent refuses"
+- Demonstrate by manually setting confidence to 0.65 → Show refusal
+
+**If they ask**: "How is this different from a rule engine?"
+**Response**:
+- "Rules can't detect 4-dimensional patterns like 'HDFC Rewards >₹5K @ 14:00'"
+- Show weekend VIP pattern: "No SQL query finds this - requires reasoning"
+- Point to Council reasoning text: "This is natural language explanation, not code"
+
+---
+
+### Technical Implementation Notes
+
+**For the live simulation to work**:
+1. **Process transactions in batches**: 10-20 at a time (not all 2500 at once)
+2. **Add artificial delays**: 0.5 seconds between batches (makes it watchable)
+3. **Auto-pause on patterns**: When pattern detected, pause for 2 seconds
+4. **Smooth animations**: Use CSS transitions for bank stat changes
+5. **Sound effects** (optional): Subtle "ping" when reroute succeeds
+
+**Streamlit tricks for smooth UI**:
+```python
+# Use st.empty() containers for live updates
+bank_status = st.empty()
+transaction_feed = st.empty()
+agent_actions = st.empty()
+
+# Update in loop
+for batch in transaction_batches:
+    bank_status.write(get_bank_stats())
+    transaction_feed.write(get_recent_txns())
+    time.sleep(0.5)  # Watchable speed
+```
+
+---
+
+### CHECKPOINT 6.5: Rehearsal Validation
 
 ## STEP 7: FINAL INTEGRATION & TESTING (3 hours)
 
@@ -1337,9 +1680,13 @@ Your project is demo-ready when:
 ✅ **Execution Logs**: `execution_log.json` shows all actions taken with timestamps
 ✅ **Simulated Gateway**: Reroute simulator provides realistic responses with cost tracking
 ✅ **File System Proof**: Config files updated, decisions logged to database/JSON
+✅ **Live Bank Monitor**: 4-column view showing real-time success rates, TPS, latency per bank
+✅ **Live Transaction Feed**: Scrolling log showing reroutes happening (HDFC→Axis with timestamps)
+✅ **Visual Proof**: Judges WATCH bank stats change as agent reroutes traffic
+✅ **Agent Action Theater**: Council reasoning + Executor validation displayed in real-time
 ✅ **UI Clarity**: Dashboard shows live action feed ("Email sent at 14:32:15")
 ✅ **Reliability**: Runs 10 times without crash
-✅ **Demo-Readiness**: <3 minute pitch, judges receive email during demo  
+✅ **Demo-Readiness**: <3 minute pitch with live simulation, judges SEE reroutes happening  
 
 ---
 
