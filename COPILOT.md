@@ -1,15 +1,3 @@
-# SENTINEL BUILD COPILOT
-## Your AI Pair Programmer's Master Blueprint
-
-**PURPOSE**: This document provides your IDE's LLM (Cursor/Copilot/Codeium/Claude) with complete context to guide you through building SENTINEL. At each step, your AI can review your implementation, validate outputs, and ensure you're on the winning path.
-
-**HOW TO USE THIS**:
-1. Feed this ENTIRE document to your AI assistant at project start
-2. At each CHECKPOINT, share your code/output and ask: "Review my Step X - does this meet the requirements?"
-3. Your AI will validate against success criteria and catch issues early
-
----
-
 ## 🎯 PROJECT CONTEXT (Critical - Read First)
 
 ### The Mission
@@ -25,29 +13,44 @@ Build **SENTINEL** - a Pattern-Detective AI for payment failure remediation that
 - Hidden patterns require AI to connect dots across time, amount, bank, card type
 - Example: "HDFC Rewards >₹5K fail ONLY during 14:00-16:00" ← 4 dimensions
 - Simple SQL can't find this; only temporal + multi-attribute reasoning can
+- Goes beyond payment failures: detects traffic surges, fraud patterns, risk anomalies
 
 #### 2. Profit-Aware Logic (The Business Value)
 - Formula: `Net_Benefit = (Transaction_Amount × 2%) - ₹15_Reroute_Cost`
 - If Net_Benefit < 0 → Let it fail (don't waste money)
 - If Net_Benefit > 0 → Reroute (profitable intervention)
+- Exception: Security threats override profit logic (block fraud even at negative margin)
 
 #### 3. Explainable Decisions (The Trust Factor)
 - Every action has a reasoning: "47 transactions × ₹141 net = ₹6,627 savings"
 - No black boxes: Judges must understand WHY the AI chose to act/ignore
+- Multiple decision types: REROUTE, THROTTLE, BLOCK, ESCALATE - each with clear justification
 
 ### Success Metrics (The Scoreboard)
 | Metric | Target | Why It Matters |
 |--------|--------|----------------|
 | Net Profit | +₹800 | Baseline loses ₹2,250. We prove 300%+ improvement |
-| Patterns Found | 3/3 | Proves AI intelligence vs. rule-based systems |
+| Patterns Found | 6/6 | All intelligence traps detected (payment, traffic, fraud, risk) |
 | Decision Accuracy | >85% | Shows reliability (not just luck) |
+| False Positive Rate | <5% | Minimal unnecessary blocks on legitimate users |
+| Fraud Detection Rate | >90% | Card testing and suspicious patterns caught |
 | Demo Clarity | <3 min | Must tell compelling before/after story |
 
 ### Tech Stack
 - **Core**: Python 3.10+, Pandas, NumPy
 - **AI**: OpenAI GPT-4 via LangChain, Pydantic validation
+- **Agent**: Phidata for covering agentic logic for "The Operator"
 - **UI**: Streamlit (fastest to build, good enough for demos)
 - **Data**: Synthetic (we control the patterns)
+
+```
+THE STRATEGIST (Council Agent)          THE OPERATOR (Executor Agent)
+    OpenAI + LangChain                      Phidata + Tools
+           ↓                                      ↓
+    "What should we do?"              "Can I safely do this?"
+           ↓                                      ↓
+    AgentDecision objects            ExecutionResult objects
+```
 
 ### System Architecture
 ```
@@ -58,15 +61,44 @@ Build **SENTINEL** - a Pattern-Detective AI for payment failure remediation that
            │ transactions.csv
            ↓
 ┌─────────────────────┐
-│   PATTERN AGENT     │  Step 3-5: LLM analyzes failure clusters
-│   (The Brain)       │           + Makes profit-aware decisions
-└──────────┬──────────┘           + Validates via Pydantic
-           │ AgentDecision objects
+│  COUNCIL AGENT      │  Step 3-4: Multi-persona LLM debate
+│  (The Strategist)   │           • Risk Advisor (conservative)
+│  OpenAI/LangChain   │           • Finance Optimizer (aggressive)
+│                     │           • Pattern Detective (neutral)
+│                     │           → Produces AgentDecision[]
+└──────────┬──────────┘
+           │ decisions.json (recommendations)
            ↓
+      ┌─────────────────────────────────┐
+      │   SAFETY VALIDATION LAYER       │
+      │   (Executor's First Check)      │
+      │   • Confidence > 70%?           │
+      │   • Net benefit positive?       │
+      │   • Within capacity limits?     │
+      └────────┬─────────────┬──────────┘
+               │ PASS        │ FAIL
+               ↓             ↓
+┌──────────────────┐  ┌──────────────────┐
+│ EXECUTOR AGENT   │  │  SAFETY OVERRIDE │
+│ (The Operator)   │  │  Log refusal +   │
+│ Phidata + Tools  │  │  reasoning       │
+│                  │  └──────────────────┘
+│ Tools:           │
+│ • RerouteTool    │
+│ • AlertTool      │
+│ • ValidationTool │
+│                  │
+│ → ExecutionResult│
+└────────┬─────────┘
+         │ execution_logs.json (actual results)
+         ↓
 ┌─────────────────────┐
-│   WAR ROOM UI       │  Step 6-7: Streamlit dashboard
-│   (The Story)       │           + Shows patterns discovered
-└─────────────────────┘           + Displays ₹ impact
+│   WAR ROOM UI       │  Step 5-6: Streamlit dashboard
+│   (The Story)       │           + Council recommendations
+│                     │           + Executor actions taken
+│                     │           + Safety overrides (refusals)
+│                     │           + Side-by-side comparison
+└─────────────────────┘
 ```
 
 ---
@@ -74,25 +106,38 @@ Build **SENTINEL** - a Pattern-Detective AI for payment failure remediation that
 ## 📋 IMPLEMENTATION ROADMAP
 
 ### Time Allocation (16 Hours Total)
-- **Setup** (30 min): Environment, dependencies, config
-- **Chaos Engine** (2 hrs): Data generation with intelligent traps
-- **Pydantic Models** (30 min): LLM output validation
-- **Pattern Agent** (6 hrs): The LLM reasoning core (MOST CRITICAL)
-- **Dashboard** (4 hrs): Streamlit UI with metrics
-- **Testing & Polish** (3 hrs): End-to-end validation, bug fixes
+
+| Phase | Duration | Focus |
+|-------|----------|-------|
+| Setup | 30 min | Environment, dependencies, config (add Phidata) |
+| Chaos Engine | 2 hrs | Data generation with intelligent traps |
+| Pydantic Models | 45 min | Validation for Council + Executor + Safety overrides |
+| Council Agent | 4 hrs | Multi-persona LLM reasoning core |
+| Executor Agent | 4 hrs | Phidata with safety tools ⭐ MOST CRITICAL |
+| Dashboard | 3 hrs | Streamlit UI showing dual-layer decisions |
+| Testing & Polish | 1.75 hrs | End-to-end validation, safety testing |
 
 ### Project Structure
 ```
 sentinel/
-├── config.py              # All constants (costs, thresholds)
-├── chaos_engine.py        # Synthetic data generator
-├── models.py              # Pydantic validation schemas
-├── pattern_agent.py       # LLM decision engine
-├── dashboard.py           # Streamlit UI
-├── requirements.txt       # Dependencies
-├── .env                   # API keys
-├── transactions.csv       # Generated data (output)
-└── README.md              # Hackathon submission
+├── config.py                  # Constants + SAFETY_CONSTRAINTS
+├── chaos_engine.py            # Synthetic data generator
+├── models.py                  # AgentDecision, ExecutionResult, SafetyOverride
+├── council_agent.py           # Multi-persona LLM (The Strategist)
+├── executor_agent.py          # Phidata agent (The Operator) ⭐ NEW
+├── safety_validator.py        # Safety guardrail logic ⭐ NEW
+├── tools/                     # Phidata custom tools ⭐ NEW
+│   ├── __init__.py
+│   ├── reroute_tool.py       # Payment rerouting simulator
+│   ├── alert_tool.py         # Alert generation
+│   └── validation_tool.py    # Pre-execution checks
+├── dashboard.py               # Streamlit UI (updated for dual-layer)
+├── requirements.txt           # Add: phidata, phi-assistant
+├── .env                       # API keys
+├── transactions.csv           # Generated data (output)
+├── decisions.json             # Council output (output) ⭐ NEW
+├── execution_logs.json        # Executor output (output) ⭐ NEW
+└── README.md                  # Hackathon submission
 ```
 
 ---
@@ -243,6 +288,188 @@ A synthetic transaction generator that creates 1000 payment records with 3 embed
 
 **Critical insight**: AI must recommend `ALERT` (ops intervention), not `REROUTE` (futile expense)
 
+#### Component 2.5: Intelligence Trap #4 - "The Traffic Tsunami"
+**Pattern characteristics**:
+- **Trigger**: Simulate flash sale event with 4x normal transaction volume in 15-minute window
+- **Behavior**: All providers show elevated latency (500ms → 2000ms), failure rates climb uniformly from 8% → 35%
+- **Error**: Mix of `TIMEOUT` and `QUEUE_FULL`
+
+**Why it's hard**:
+- Not a single provider issue (can't simply reroute)
+- Requires recognizing system-wide stress vs. localized failure
+- AI must recommend throttling, not blind rerouting
+
+**Expected volume**: 400 transactions in compressed 15-minute window (vs. normal 100)
+
+**Critical insight**: AI must recommend `THROTTLE` or `QUEUE`, not `REROUTE` (rerouting to equally stressed providers wastes money)
+
+#### Component 2.6: Intelligence Trap #5 - "The Card Tester"
+**Pattern characteristics**:
+- **Trigger**: Single card (or sequential BIN range) attempting 15+ transactions in 3 minutes
+- **Behavior**: All transactions small amounts (₹1-₹50), mostly `DECLINED`
+- **Error**: `DECLINED` with velocity decline reason
+- **Additional signal**: Same device fingerprint, unusual geographic origin
+
+**Why it's hard**:
+- Transactions are individually low-value (normally would IGNORE)
+- But pattern indicates fraud (card testing attack)
+- AI must escalate to security, not dismiss as unprofitable
+
+**Expected volume**: 15-25 transactions from single source in burst
+
+**Critical insight**: AI must recommend `BLOCK_CARD` and `ESCALATE_SECURITY`, not `IGNORE` (even though margin is negative)
+
+#### Component 2.7: Intelligence Trap #6 - "The Whale Alert"
+**Pattern characteristics**:
+- **Trigger**: Transaction amount > ₹50,000 from user with historical max of ₹5,000
+- **Behavior**: Transaction may succeed or fail, but requires review regardless
+- **Additional signals**: New merchant category, first crypto/forex transaction, dormant account
+
+**Why it's hard**:
+- Transaction might be legitimate (user making large purchase)
+- But risk profile demands step-up authentication
+- AI must balance customer friction vs. fraud prevention
+
+**Expected volume**: 5-10 high-risk transactions scattered through dataset
+
+**Critical insight**: AI must recommend `STEP_UP_AUTH` or `HOLD_FOR_REVIEW`, not auto-approve or auto-block
+
+---
+
+### Extended Scenario Coverage
+
+Beyond simple payment reroutes, SENTINEL must handle a broader range of operational scenarios. These categories ensure the system provides comprehensive protection across the payment ecosystem.
+
+#### Scenario Category 1: High Traffic Surge Handling
+
+**What it is**: Sudden spikes in transaction volume that overwhelm payment infrastructure, causing cascading failures across multiple providers simultaneously.
+
+**Detection signals**:
+- Transaction velocity exceeds 3x normal rate within 5-minute window
+- Latency across ALL providers increases uniformly (not just one bank)
+- Queue depth metrics show exponential growth
+- Error codes shift from DECLINED to TIMEOUT (infrastructure stress vs. business logic)
+
+**Decision logic**:
+- If surge is temporary (event-driven, e.g., flash sale): `THROTTLE` - reduce traffic to sustainable levels
+- If surge persists and backup capacity exists: `SCALE` - activate overflow routing
+- If system is at capacity with no headroom: `QUEUE` - implement fair queueing with priority tiers
+- Never blindly reroute during global surge (all providers are equally stressed)
+
+**Cost considerations**:
+- Throttling cost: Lost transactions × margin (but prevents total outage)
+- Scaling cost: Premium routing fees for overflow capacity
+- Queueing cost: Delayed customer experience, potential cart abandonment
+
+**Example pattern**: "11:00 AM - Transaction rate jumped from 50 TPS to 180 TPS. All 4 payment providers showing 800ms+ latency. Error rate climbing uniformly. Recommendation: THROTTLE to 100 TPS until infrastructure stabilizes. Estimated lost revenue: ₹12,000. Prevented cascade failure cost: ₹85,000+"
+
+---
+
+#### Scenario Category 2: Server Outage Detection
+
+**What it is**: Complete or partial failure of payment provider infrastructure, distinct from normal transaction failures.
+
+**Detection signals**:
+- 100% failure rate for a specific provider (vs. partial failure patterns)
+- Connection timeouts dominate error codes (not business declines)
+- No successful transactions for 2+ minutes from a provider
+- Health check endpoints returning errors or timing out
+
+**Decision logic**:
+- If single provider down with alternatives available: `FAILOVER` - immediate traffic redirect
+- If multiple providers showing stress: `ALERT` - escalate to ops (potential upstream issue)
+- If partial outage (specific regions/card types): `SELECTIVE_REROUTE` - targeted traffic steering
+- If all providers degraded: `CIRCUIT_BREAK` - halt new transactions, protect existing sessions
+
+**Escalation triggers**:
+- Outage duration > 5 minutes → Auto-escalate to on-call team
+- Outage affecting > 30% of traffic → SMS alert to leadership
+- Outage during peak hours (10 AM - 10 PM) → Immediate P1 incident
+
+**Example pattern**: "ICICI payment gateway returning connection refused errors. 100% failure rate for last 3 minutes. Health check confirmed DOWN. 47 transactions affected so far. Recommendation: FAILOVER to Axis Bank immediately. Estimated recovery time: unknown. Alert ops team for vendor communication."
+
+---
+
+#### Scenario Category 3: Suspicious Activity Detection
+
+**What it is**: Patterns indicating potential fraud, bot activity, or account compromise that require security intervention rather than simple rerouting.
+
+**Detection signals**:
+- Velocity anomalies: Same card/user attempting 10+ transactions in 60 seconds
+- Geographic impossibility: Transactions from distant locations within minutes
+- Amount patterns: Repeated exact amounts (card testing behavior)
+- Decline cycling: Same card trying multiple small amounts after large decline
+- Device fingerprint anomalies: Known fraudulent device signatures
+- BIN attacks: Sequential card numbers being tested
+
+**Decision logic**:
+- If isolated suspicious user: `BLOCK_USER` - temporary hold pending verification
+- If card testing pattern detected: `BLOCK_CARD` - prevent further attempts, alert issuer
+- If coordinated attack suspected: `RATE_LIMIT` - apply aggressive throttling to pattern
+- If high-value account compromise: `ESCALATE_SECURITY` - immediate human review
+- Never auto-reroute suspicious transactions (amplifies fraud exposure)
+
+**Risk scoring**:
+- Low (score < 30): Monitor only, allow transaction
+- Medium (30-70): Add friction (OTP, 3DS), log for review
+- High (> 70): Block and alert, require manual approval
+
+**Example pattern**: "Card ending 4521 has attempted 23 transactions in 4 minutes, all ₹1-₹10, all declined. Classic card testing behavior. BIN indicates international card from unusual geography. Recommendation: BLOCK_CARD immediately, notify issuing bank, flag merchant account for review. Do NOT reroute - prevents fraud amplification."
+
+---
+
+#### Scenario Category 4: High-Risk Payment Handling
+
+**What it is**: Legitimate transactions that carry elevated risk due to amount, merchant category, or user history, requiring additional validation before processing.
+
+**Detection signals**:
+- Transaction amount > user's historical maximum by 5x+
+- First transaction from new high-risk merchant category (crypto, gambling, forex)
+- Dormant account suddenly active with large transaction
+- Cross-border transaction to high-risk geography
+- Mismatched billing/shipping addresses
+- Corporate card used for personal-category purchases
+
+**Decision logic**:
+- If risk is verifiable: `STEP_UP_AUTH` - request additional authentication
+- If risk requires human judgment: `HOLD_FOR_REVIEW` - queue for manual approval
+- If known good customer with unusual pattern: `SOFT_DECLINE` - decline with retry option
+- If transaction matches fraud pattern but customer is VIP: `ESCALATE_PRIORITY` - expedited human review
+- If regulatory requirement: `COMPLIANCE_HOLD` - mandatory review regardless of outcome
+
+**Business rules**:
+- Never auto-approve transactions > ₹50,000 from new users
+- Always step-up auth for first international transaction
+- Require 2FA for crypto-related merchant categories
+- Hold all transactions from sanctioned geographies for compliance
+
+**Example pattern**: "User ID 78234 (account age: 8 months, typical transaction: ₹500-₹2,000) attempting ₹75,000 purchase at cryptocurrency exchange. First crypto transaction on account. Risk score: 67. Recommendation: STEP_UP_AUTH with mandatory OTP verification. If user completes auth, proceed with transaction but flag for 24-hour review. Do not auto-decline VIP tier users."
+
+---
+
+### Extended Decision Types Reference
+
+The original REROUTE/IGNORE/ALERT decisions are expanded to cover all operational scenarios:
+
+| Decision | Use Case | When to Apply |
+|----------|----------|---------------|
+| `REROUTE` | Payment failure remediation | Net benefit positive, pattern is fixable via alternate provider |
+| `IGNORE` | Unprofitable intervention | Reroute cost exceeds transaction margin |
+| `ALERT` | Ops notification needed | Pattern requires human judgment or vendor escalation |
+| `THROTTLE` | High traffic protection | System approaching capacity limits |
+| `FAILOVER` | Provider outage response | Single provider down, alternatives available |
+| `CIRCUIT_BREAK` | System protection | Multiple providers degraded, prevent cascade |
+| `BLOCK_USER` | Suspicious activity | Individual user shows fraud patterns |
+| `BLOCK_CARD` | Card compromise | Card testing or stolen card indicators |
+| `RATE_LIMIT` | Attack mitigation | Coordinated abuse pattern detected |
+| `STEP_UP_AUTH` | High-risk validation | Transaction requires additional verification |
+| `HOLD_FOR_REVIEW` | Manual approval needed | Risk too high for automated decision |
+| `ESCALATE_SECURITY` | Security team involvement | Potential account compromise or fraud ring |
+| `ESCALATE_PRIORITY` | VIP handling | High-value customer requires white-glove treatment |
+| `COMPLIANCE_HOLD` | Regulatory requirement | Transaction requires mandatory compliance review |
+
+---
+
 ### CHECKPOINT 2: Validation
 
 **What to check**:
@@ -251,6 +478,9 @@ A synthetic transaction generator that creates 1000 payment records with 3 embed
 ✅ Trap 1 (HDFC Whale): 40-60 affected txns, >95% failure rate  
 ✅ Trap 2 (SBI Micro): 100-150 affected txns, ~75% failure rate  
 ✅ Trap 3 (ICICI Canary): Clear spike visible when sorted by timestamp  
+✅ Trap 4 (Traffic Tsunami): 400 txns in compressed window, uniform stress  
+✅ Trap 5 (Card Tester): 15-25 micro-transactions from single source  
+✅ Trap 6 (Whale Alert): 5-10 high-value anomalous transactions  
 
 **AI Review Prompt**:
 ```
@@ -336,10 +566,13 @@ Pydantic catches these at runtime BEFORE they pollute your dashboard.
 4. **temporal_signal** (enum: "stable", "spike_detected", "declining")
    - Indicates if failure rate is changing
 
-5. **decision** (enum: "REROUTE", "IGNORE", "ALERT")
-   - The final action
+5. **decision** (enum: see Decision Types below)
+   - The final action recommendation
 
-6. **reasoning** (string, min 100 chars)
+6. **risk_category** (enum: "payment_failure", "high_traffic", "server_outage", "suspicious_activity", "high_risk_payment")
+   - Classification of the detected issue type
+
+7. **reasoning** (string, min 100 chars)
    - Business explanation, NOT technical jargon
    - FORBIDDEN words: "model", "algorithm", "neural network"
    - REQUIRED elements: specific numbers, impact in ₹
@@ -491,13 +724,15 @@ You are NOT a "fix everything" bot. You are a PROFIT optimizer.
 
 **Section 3: Reasoning Framework**
 ```
-For each failure cluster, analyze THREE dimensions:
+For each failure cluster, analyze FIVE dimensions:
 
 1. PATTERN DETECTION
    - Is this isolated or systemic?
    - What's the specific segment? (bank + card + amount + time)
+   - Is this a single-provider issue or system-wide stress?
    - Example: "HDFC Rewards >₹5K failing at 2PM" = pattern
    - Example: "Random HDFC failures" = noise
+   - Example: "All providers slow simultaneously" = traffic surge
 
 2. COST-BENEFIT ANALYSIS
    Calculate:
@@ -515,6 +750,26 @@ For each failure cluster, analyze THREE dimensions:
    - Example: "ICICI Debit: 5% → 18% in 10 min" = spike
    - Spike = early warning of total outage
    - Action: ALERT (don't waste money rerouting doomed traffic)
+
+4. TRAFFIC & CAPACITY ANALYSIS
+   - Is overall transaction volume normal or elevated?
+   - Are multiple providers showing stress simultaneously?
+   - Is latency increasing uniformly across all endpoints?
+   
+   Decision Rules:
+     IF single provider down: FAILOVER to alternate
+     IF all providers stressed: THROTTLE incoming traffic
+     IF system at capacity: CIRCUIT_BREAK to prevent cascade
+
+5. SECURITY & RISK ASSESSMENT
+   - Does pattern indicate fraud (velocity, amount patterns)?
+   - Is transaction risk elevated (amount anomaly, new category)?
+   - Does user behavior match known attack patterns?
+   
+   Decision Rules:
+     IF card testing detected: BLOCK_CARD + ESCALATE_SECURITY
+     IF high-risk transaction: STEP_UP_AUTH or HOLD_FOR_REVIEW
+     IF account compromise suspected: BLOCK_USER + ESCALATE_PRIORITY
 ```
 
 **Section 4: Output Format**
@@ -577,6 +832,48 @@ Return STRICT JSON matching AgentDecision schema:
 {
   "pattern_detected": "Errors detected",  ❌ Too vague
   "reasoning": "The model identified anomalies in the data"  ❌ Technical jargon
+}
+```
+
+**Good Example 4 (Traffic Surge)**:
+```json
+{
+  "pattern_detected": "System-wide traffic surge: 180 TPS vs. normal 50 TPS, all providers stressed",
+  "affected_volume": 234,
+  "cost_analysis": "Rerouting futile - all 4 providers showing 2000ms+ latency. Throttling to 100 TPS loses ~₹12,000 in transactions but prevents ₹85,000+ cascade failure.",
+  "temporal_signal": "spike_detected",
+  "risk_category": "high_traffic",
+  "decision": "THROTTLE",
+  "reasoning": "Flash sale event causing 3.6x normal transaction volume. All payment providers showing uniform stress - HDFC, SBI, ICICI, Axis all at 2000ms+ latency with climbing error rates. This is not a single-provider issue; rerouting would simply move load between equally stressed systems. Implementing 50% throttle to reduce TPS from 180 to 100. Priority queue for VIP customers. Estimated transaction loss: ₹12,000. Prevented cascade outage value: ₹85,000+. Resume full capacity in 15 minutes.",
+  "confidence": 0.88
+}
+```
+
+**Good Example 5 (Card Testing Attack)**:
+```json
+{
+  "pattern_detected": "Card testing attack: 23 micro-transactions (₹1-₹10) from single card in 4 minutes",
+  "affected_volume": 23,
+  "cost_analysis": "Margin on these transactions: ₹2.30 total. However, this is fraud pattern - security cost of NOT blocking far exceeds revenue.",
+  "temporal_signal": "spike_detected",
+  "risk_category": "suspicious_activity",
+  "decision": "BLOCK_CARD",
+  "reasoning": "Card ending 4521 has attempted 23 transactions in 4 minutes, all ₹1-₹10 amounts, 22 declined. This is textbook card testing behavior - fraudster validating stolen card before large purchase. BIN indicates international card from high-risk geography. Normal cost-benefit would say IGNORE (negative margin), but security requires immediate BLOCK. Notifying issuing bank. Flagging merchant account for review. Blocking prevents ₹50,000+ potential fraud loss if card is validated.",
+  "confidence": 0.92
+}
+```
+
+**Good Example 6 (High-Risk Transaction)**:
+```json
+{
+  "pattern_detected": "Anomalous high-value transaction: ₹75,000 from user with ₹2,000 typical spend",
+  "affected_volume": 1,
+  "cost_analysis": "Transaction margin: ₹1,500. However, risk profile requires additional verification before approval.",
+  "temporal_signal": "stable",
+  "risk_category": "high_risk_payment",
+  "decision": "STEP_UP_AUTH",
+  "reasoning": "User ID 78234 (8-month account, typical transaction ₹500-₹2,000) attempting ₹75,000 at cryptocurrency exchange. This is their first crypto transaction ever. Transaction is 37x their historical average. While user is legitimate tier-2 member with good standing, risk score of 67 requires step-up authentication. Requesting OTP verification. If completed successfully, approve with 24-hour review flag. Do not auto-decline - this may be legitimate investment, and declining VIP users damages retention.",
+  "confidence": 0.79
 }
 ```
 
@@ -650,7 +947,60 @@ Questions:
 
 ---
 
-## STEP 5: BASELINE COMPARISON (1 hour)
+## STEP 5: EXECUTOR AGENT - Phidata Action Layer (4 hours) ⭐
+
+### What You're Building
+The execution layer that takes Council decisions and actually performs actions using Phidata's tool-calling framework. This agent has THREE critical responsibilities:
+
+1. **Validate Council decisions** against safety constraints
+2. **Execute approved actions** using specialized tools
+3. **Refuse unsafe actions** and log the override reasoning
+
+### Required Tools
+
+#### Tool 5.1: RerouteTool
+**Purpose**: Simulate rerouting failed transactions to alternate payment provider
+
+**Must do**:
+- Accept transaction ID and target provider
+- Return success/failure status with latency simulation
+- Log cost incurred (₹15 per reroute)
+
+#### Tool 5.2: AlertTool
+**Purpose**: Generate operational alerts for human intervention
+
+**Must do**:
+- Accept alert severity (LOW, MEDIUM, HIGH, CRITICAL)
+- Accept pattern description and recommended action
+- Log alert to `alerts.json` for ops team review
+
+#### Tool 5.3: ThrottleTool
+**Purpose**: Reduce transaction volume to a specific provider during stress
+
+**Must do**:
+- Accept bank name and throttle percentage (0-100%)
+- Simulate traffic reduction
+- Log throttling action with duration
+
+#### Tool 5.4: BlockTool
+**Purpose**: Temporarily block suspicious or high-risk transactions
+
+**Must do**:
+- Accept transaction filter criteria (amount, velocity, geography)
+- Block matching transactions for review
+- Log block reason and affected volume
+
+#### Tool 5.5: EscalateTool
+**Purpose**: Escalate patterns requiring immediate human review
+
+**Must do**:
+- Accept urgency level and contact method
+- Include full pattern context and recommended actions
+- Track escalation response time
+
+---
+
+## STEP 6: BASELINE COMPARISON (1 hour)
 
 ### What You're Building
 A "naive" retry-everything system to prove SENTINEL's superiority.
@@ -690,10 +1040,12 @@ FOR each failed transaction:
 ### CHECKPOINT 5: Validation
 
 **What to check**:
-✅ Baseline system implemented  
-✅ Baseline shows negative net profit  
-✅ SENTINEL shows positive net profit  
-✅ Delta is >₹1,500  
+✅ Safety validator correctly identifies unsafe decisions  
+✅ Phidata agent successfully calls custom tools  
+✅ Executor can REFUSE Council decisions (test with low confidence decision)  
+✅ Execution results contain detailed logs  
+✅ Net impact calculations are correct  
+✅ SafetyOverride objects are created when appropriate  
 
 **AI Review Prompt**:
 ```
@@ -851,6 +1203,23 @@ End-to-end workflow that runs from data generation → analysis → dashboard di
 - Remove .env file
 - Expected: Clear error message, does not crash mysteriously
 
+#### Safety Testing Requirements
+
+**Test Case 5: Safety Guardrail Test**
+- Manually create a Council decision with confidence = 0.65 (below 0.70 threshold)
+- Expected: Executor REFUSES to execute
+- Verify: SafetyOverride object is created with correct reasoning
+
+**Test Case 6: Negative ROI Test**
+- Create a decision for "Margin Destroyer" pattern (net benefit < 0)
+- Expected: Either Council recommends IGNORE, or Executor refuses REROUTE
+- Verify: No money is wasted on unprofitable patterns
+
+**Test Case 7: Council-Executor Agreement**
+- Run with "Cascading Whale" pattern
+- Expected: Council recommends REROUTE, Executor executes successfully
+- Verify: Both layers agree on high-value, high-confidence patterns
+
 ### CHECKPOINT 7: Validation
 
 **What to check**:
@@ -871,62 +1240,6 @@ Questions:
 2. Any edge cases I missed?
 3. Performance issues?"
 ```
-
----
-
-## FINAL DEMO PREPARATION
-
-### The 3-Minute Pitch Script
-
-**Minute 1: The Problem**
-```
-"Traditional payment systems treat all failures equally. 
-Show [Baseline metrics]: They rerouted 200 failures, 
-spent ₹3,000, and LOST ₹2,200. 
-That's burning capital to fix ₹10 transactions."
-```
-
-**Minute 2: The Solution**
-```
-"SENTINEL uses AI to find patterns humans miss.
-Click [Run Analysis] → Watch it discover:
-• Pattern 1: HDFC Rewards >₹5K failing at 2PM
-• Pattern 2: SBI micro-transactions (unprofitable to fix)
-• Pattern 3: ICICI spike (early warning of outage)
-
-This isn't just error handling. It's pattern intelligence."
-```
-
-**Minute 3: The Impact**
-```
-Point to [Comparison Chart]:
-SENTINEL rerouted only 47 failures (vs 200)
-Spent ₹705 (vs ₹3,000)
-Net profit: +₹847 (vs -₹2,200)
-
-That's a ₹3,047 swing. And look [point to reasoning]:
-Every decision has business justification.
-No black boxes. Complete explainability.
-```
-
-### Pre-Demo Checklist
-
-**24 Hours Before**:
-✅ Run pipeline 10 times, verify consistency  
-✅ Take screenshots of perfect run  
-✅ Prepare backup (pre-generated results if LLM fails)  
-✅ Write README.md with setup instructions  
-
-**1 Hour Before**:
-✅ Test on fresh Python environment  
-✅ Verify API key works  
-✅ Practice demo script (60 seconds, timed)  
-✅ Have backup laptop  
-
-**5 Minutes Before**:
-✅ Dashboard already loaded  
-✅ Terminal ready for "one command" demo  
-✅ Water, charger, confidence  
 
 ---
 
@@ -955,11 +1268,16 @@ No black boxes. Complete explainability.
 
 Your project is demo-ready when:
 
-✅ **Data Quality**: 1000 transactions, 3 clear patterns, 15-25% failure rate  
-✅ **Pattern Detection**: LLM finds all 3 traps consistently (5/5 runs)  
+✅ **Data Quality**: 1000 transactions, 6 clear patterns (payment + traffic + fraud + risk), 15-25% failure rate  
+✅ **Pattern Detection**: LLM finds all 6 traps consistently (5/5 runs)  
+✅ **Decision Variety**: Uses appropriate decisions (REROUTE, IGNORE, ALERT, THROTTLE, BLOCK, STEP_UP_AUTH)  
 ✅ **Decision Quality**: >85% accuracy, no contradictory logic  
+✅ **Security Awareness**: Correctly identifies and escalates fraud patterns (not just IGNORE low-margin attacks)  
+✅ **Traffic Handling**: Recognizes system-wide stress vs. single-provider issues  
 ✅ **Explainability**: Every decision has 100+ word business reasoning  
 ✅ **Financial Impact**: Net profit >₹500, baseline is negative  
+✅ **Fraud Prevention**: Card testing and suspicious patterns caught (>90% detection)  
+✅ **False Positive Rate**: <5% unnecessary blocks on legitimate users  
 ✅ **UI Clarity**: Non-technical person can understand dashboard in 30 seconds  
 ✅ **Reliability**: Runs 10 times without crash  
 ✅ **Demo-Readiness**: <3 minute pitch tells compelling story  
