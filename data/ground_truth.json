@@ -1,0 +1,66 @@
+{
+  "generation_timestamp": "2026-01-31T22:28:37.512140",
+  "configuration": {
+    "total_transactions": 2500,
+    "base_success_rate": 0.92,
+    "random_seed": 42
+  },
+  "patterns_injected": {
+    "whale_trap": {
+      "description": "HDFC Rewards >\u20b95K failing during afternoon window",
+      "matched_transactions": 35,
+      "failed_transactions": 35,
+      "failure_rate": 1.0,
+      "expected_action": "REROUTE",
+      "profitability": "HIGH"
+    },
+    "margin_destroyer": {
+      "description": "SBI micro-transactions <\u20b9100 with high failure rate",
+      "matched_transactions": 89,
+      "failed_transactions": 65,
+      "failure_rate": 0.7303370786516854,
+      "expected_action": "IGNORE",
+      "profitability": "NEGATIVE"
+    },
+    "canary_spike": {
+      "description": "ICICI Debit escalating failure pattern",
+      "matched_transactions": 65,
+      "failed_transactions": 47,
+      "failure_rate": 0.7230769230769231,
+      "expected_action": "ALERT",
+      "profitability": "N/A"
+    },
+    "weekend_vip": {
+      "description": "VIP Travel transactions failing on weekends",
+      "matched_transactions": 188,
+      "failed_transactions": 124,
+      "failure_rate": 0.6595744680851063,
+      "expected_action": "REROUTE",
+      "profitability": "MEDIUM"
+    }
+  },
+  "overall_statistics": {
+    "total_transactions": 2500,
+    "successes": 2041,
+    "failures": 459,
+    "success_rate": 0.8164
+  },
+  "expected_outcomes": {
+    "whale_trap": {
+      "action": "REROUTE",
+      "reasoning": "High-value transactions with good margin, profitable to fix"
+    },
+    "margin_destroyer": {
+      "action": "IGNORE",
+      "reasoning": "Low-value transactions, reroute cost exceeds margin (unprofitable)"
+    },
+    "canary_spike": {
+      "action": "ALERT",
+      "reasoning": "Escalating failure pattern indicates infrastructure issue, alert ops team"
+    },
+    "weekend_vip": {
+      "action": "REROUTE",
+      "reasoning": "Medium-high value VIP customers, profitable and retention-critical"
+    }
+  }
+}

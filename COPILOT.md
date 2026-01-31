@@ -209,7 +209,7 @@ Validate:
 ## STEP 2: CHAOS ENGINE - Data Generation (2 hours)
 
 ### What You're Building
-A synthetic transaction generator that creates 1000 payment records with 3 embedded "intelligence traps" - patterns that require AI reasoning to discover.
+A synthetic transaction generator that creates 2500 payment records with 4 embedded "intelligence traps" - patterns that require AI reasoning to discover through multi-dimensional correlation.
 
 ### Why This Matters
 **This is your proof of concept**. If patterns are:
@@ -227,68 +227,105 @@ A synthetic transaction generator that creates 1000 payment records with 3 embed
 {
     "transaction_id": "TXN00042",        # Unique ID
     "timestamp": datetime,               # Temporal dimension (for pattern correlation)
-    "bank": str,                         # Enum: [HDFC, SBI, ICICI, Axis]
-    "card_type": str,                    # Enum: [Debit, Credit, Rewards]
-    "amount": float,                     # Range: ₹10 - ₹15,000
+    "bank": str,                         # Enum: [HDFC, SBI, ICICI, Axis, Kotak]
+    "card_type": str,                    # Enum: [Debit, Credit, Rewards, Corporate]
+    "amount": float,                     # Range: ₹10 - ₹15,000 (lognormal distribution)
     "status": str,                       # Enum: [SUCCESS, FAILED]
     "latency_ms": int,                   # Normal distribution ~250ms
-    "error_code": str | None             # If FAILED: [TIMEOUT, DECLINED, NETWORK_ERROR]
+    "error_code": str | None,            # Error taxonomy (see below)
+    "merchant_category": str,            # Enum: [E-commerce, Travel, Food, Utilities]
+    "customer_tier": str                 # Enum: [VIP, Regular, New]
 }
 ```
 
+**Error Code Taxonomy** (critical for LLM reasoning):
+- **Infrastructure**: TIMEOUT, GATEWAY_TIMEOUT, SERVICE_UNAVAILABLE, SLOW_RESPONSE
+- **Policy**: RISK_THRESHOLD_EXCEEDED, DAILY_LIMIT_REACHED
+- **Customer**: INSUFFICIENT_FUNDS, CARD_BLOCKED, EXPIRED_CARD, DECLINED
+- **Fraud**: SUSPICIOUS_ACTIVITY, FRAUD_CHECK_TIMEOUT
+
+**Pattern-Error Correlation**: Each pattern should use specific error codes (90% correlation, 10% noise)
+
 **Baseline behavior**:
 - 92% success rate (mimics real payment systems)
-- Random distribution across banks/card types
+- Random distribution across banks/card types/merchants
 - Timestamps spread over 24-hour window
+- Amount distribution: Lognormal (many small, few large transactions)
 
 #### Component 2.2: Intelligence Trap #1 - "The Cascading Whale"
 **Pattern characteristics**:
 - **Trigger**: `bank == "HDFC" AND card_type == "Rewards" AND amount > 5000 AND hour IN [14, 15]`
 - **Behavior**: 98% failure rate (nearly deterministic)
-- **Error**: `TIMEOUT` with latency ~8000ms
+- **Error**: `RISK_THRESHOLD_EXCEEDED` (90%), `TIMEOUT` (10% noise)
+- **Latency**: ~8000ms for failed transactions
 
 **Why it's hard**:
 - Requires 4-dimensional correlation (bank + card + amount + time)
 - Not all HDFC fails (only Rewards)
 - Not all Rewards fail (only >₹5K)
 - Not all >₹5K fail (only during 14:00-16:00)
+- Error code signals policy issue, not infrastructure
 
-**Expected volume**: 40-60 transactions (enough to be statistically significant)
+**Expected volume**: 35 matching transactions (~34 failures)
 
-**Business impact**: High margin (₹156 avg) × High volume = ₹6,000+ savings opportunity
+**Business impact**: High margin (₹156 avg) × High volume = ₹4,935 profit opportunity
 
 #### Component 2.3: Intelligence Trap #2 - "The Margin Destroyer"
 **Pattern characteristics**:
 - **Trigger**: `bank == "SBI" AND amount < 100`
 - **Behavior**: 75% failure rate
-- **Error**: `DECLINED`
+- **Error**: `DECLINED` (80%), `INSUFFICIENT_FUNDS` (20%)
 
 **Why it's hard**:
 - Pattern is obvious (simple amount filter)
 - But the AI must realize it's UNPROFITABLE to fix
 - Margin = ₹2 (avg), Reroute cost = ₹15 → Net: -₹13
 
-**Expected volume**: 100-150 transactions (high noise)
+**Expected volume**: 85 matching transactions (~64 failures)
 
-**Critical insight**: The AI must recommend `IGNORE`, not `REROUTE` (tests profit awareness)
+**Critical insight**: The AI must recommend `IGNORE`, not `REROUTE` (tests profit awareness and prevents capital waste)
 
 #### Component 2.4: Intelligence Trap #3 - "The Canary Spike"
 **Pattern characteristics**:
 - **Phase 1 (Early Warning)**: `bank == "ICICI" AND card_type == "Debit"` shows failure rate jump from 5% → 18%
 - **Phase 2 (Total Outage)**: 30 minutes later, ALL ICICI transactions fail (100%)
+- **Error Progression**: `SLOW_RESPONSE` (Phase 1) → `SERVICE_UNAVAILABLE` (Phase 2)
 
 **Why it's hard**:
 - Requires temporal correlation (detecting failure rate acceleration)
 - AI must predict future failures based on early warning signal
 - Not just pattern detection, but predictive reasoning
+- Error code escalation signals infrastructure cascade
 
 **Expected behavior**:
-- Phase 1: Select 20 ICICI Debit transactions in a time cluster, fail 18% of them
-- Phase 2: 30-90 minutes later, fail 100% of ALL ICICI transactions
+- Phase 1: 60 ICICI Debit transactions, 18% failure rate (~11 failures)
+- Phase 2: 30-60 minutes later, remaining ICICI transactions fail at 100% (~43 failures)
 
-**Critical insight**: AI must recommend `ALERT` (ops intervention), not `REROUTE` (futile expense)
+**Expected volume**: 60 total matching transactions (~54 failures)
 
-#### Component 2.5: Intelligence Trap #4 - "The Traffic Tsunami"
+**Critical insight**: AI must recommend `ALERT` (ops intervention), not `REROUTE` (futile expense when infrastructure is failing)
+
+#### Component 2.5: Intelligence Trap #4 - "Weekend VIP Anomaly"
+**Pattern characteristics**:
+- **Trigger**: `customer_tier == "VIP" AND merchant_category == "Travel" AND day_type == "Weekend"`
+- **Behavior**: 65% failure rate
+- **Error**: `FRAUD_CHECK_TIMEOUT` (70%), `RISK_THRESHOLD_EXCEEDED` (30%)
+
+**Why it's hard**:
+- No obvious bank correlation (distributed across all providers)
+- Requires reasoning across merchant category + customer tier + temporal dimensions
+- Tests if AI can detect patterns beyond traditional payment attributes
+- Margin is medium-high but volume is moderate
+
+**Expected volume**: 22 matching transactions (~14 failures)
+
+**Business impact**: Medium-high value transactions (₹3,500 avg), profitable to fix
+
+**Critical insight**: AI must recognize multi-dimensional patterns that don't fit traditional bank/card filters
+
+---
+
+### Extended Scenario Coverage
 **Pattern characteristics**:
 - **Trigger**: Simulate flash sale event with 4x normal transaction volume in 15-minute window
 - **Behavior**: All providers show elevated latency (500ms → 2000ms), failure rates climb uniformly from 8% → 35%
@@ -947,43 +984,64 @@ Questions:
 
 ---
 
-## STEP 5: EXECUTOR AGENT - Phidata Action Layer (4 hours) ⭐
+## STEP 5: ACTION EXECUTOR - Real Execution Layer (3 hours) ⭐
 
 ### What You're Building
-The execution layer that takes Council decisions and actually performs actions using Phidata's tool-calling framework. This agent has THREE critical responsibilities:
+The execution layer that takes LLM decisions and **actually performs actions**. Not just recommendations - real execution with proof.
 
-1. **Validate Council decisions** against safety constraints
-2. **Execute approved actions** using specialized tools
-3. **Refuse unsafe actions** and log the override reasoning
+**Execution Strategy**:
+- ✅ **Email alerts**: REAL (use SMTP or SendGrid to send actual emails)
+- ✅ **File system logs**: REAL (write to `execution_log.json` with timestamps)
+- ✅ **Payment reroutes**: SIMULATED (mock gateway with realistic responses)
+- ✅ **Database updates**: REAL (SQLite or JSON file showing transaction status changes)
 
-### Required Tools
+### Required Action Tools
 
-#### Tool 5.1: RerouteTool
-**Purpose**: Simulate rerouting failed transactions to alternate payment provider
-
-**Must do**:
-- Accept transaction ID and target provider
-- Return success/failure status with latency simulation
-- Log cost incurred (₹15 per reroute)
-
-#### Tool 5.2: AlertTool
-**Purpose**: Generate operational alerts for human intervention
+#### Tool 5.1: EmailAlertTool
+**Purpose**: Send REAL email alerts for patterns requiring ops intervention
 
 **Must do**:
-- Accept alert severity (LOW, MEDIUM, HIGH, CRITICAL)
-- Accept pattern description and recommended action
-- Log alert to `alerts.json` for ops team review
+- Accept: pattern_name, severity (LOW/MEDIUM/HIGH/CRITICAL), affected_count, recommended_action
+- **Actually send email** via SMTP to configured ops email address
+- Email subject: `[SENTINEL ALERT] {severity}: {pattern_name}`
+- Email body: Include pattern details, affected volume, cost analysis, recommended action
+- Log send status to `email_log.json` (success/failure, timestamp, recipient)
+- Handle failures gracefully (retry once, then log failure)
 
-#### Tool 5.3: ThrottleTool
-**Purpose**: Reduce transaction volume to a specific provider during stress
+**Demo value**: Judges see real email arrive during presentation!
+
+#### Tool 5.2: RerouteSimulator
+**Purpose**: Simulate rerouting failed transactions to backup payment gateway
 
 **Must do**:
-- Accept bank name and throttle percentage (0-100%)
-- Simulate traffic reduction
-- Log throttling action with duration
+- Accept transaction IDs and target gateway
+- Simulate API call with realistic latency (200-500ms delay)
+- Return success/failure (90% success rate for simulation)
+- **Write to execution_log.json**: {txn_id, original_gateway, backup_gateway, result, timestamp, cost_incurred}
+- Calculate and return: transactions_rerouted, success_count, total_cost, revenue_recovered
 
-#### Tool 5.4: BlockTool
-**Purpose**: Temporarily block suspicious or high-risk transactions
+**Demo value**: Shows instant decision execution with detailed logs
+
+#### Tool 5.3: ConfigUpdater
+**Purpose**: Update routing rules to block unprofitable patterns
+
+**Must do**:
+- Accept pattern (e.g., "SBI <₹100") and action ("SKIP_REROUTE")
+- **Write to routing_config.json**: Add rule blocking future reroutes for this pattern
+- Log configuration change with timestamp and reason
+- Calculate estimated savings from future prevention
+
+**Demo value**: Shows learning capability (system improves itself)
+
+#### Tool 5.4: DatabaseLogger
+**Purpose**: Track all agent decisions and their outcomes
+
+**Must do**:
+- Write every decision to `decisions.db` (SQLite) or `decisions.json`
+- Schema: {decision_id, timestamp, pattern, action_taken, affected_count, cost, revenue, net_profit, confidence, reasoning}
+- Enable querying for dashboard display
+
+**Demo value**: Provides audit trail (judges can inspect every decision)
 
 **Must do**:
 - Accept transaction filter criteria (amount, velocity, geography)
@@ -1268,19 +1326,20 @@ Questions:
 
 Your project is demo-ready when:
 
-✅ **Data Quality**: 1000 transactions, 6 clear patterns (payment + traffic + fraud + risk), 15-25% failure rate  
-✅ **Pattern Detection**: LLM finds all 6 traps consistently (5/5 runs)  
-✅ **Decision Variety**: Uses appropriate decisions (REROUTE, IGNORE, ALERT, THROTTLE, BLOCK, STEP_UP_AUTH)  
-✅ **Decision Quality**: >85% accuracy, no contradictory logic  
-✅ **Security Awareness**: Correctly identifies and escalates fraud patterns (not just IGNORE low-margin attacks)  
-✅ **Traffic Handling**: Recognizes system-wide stress vs. single-provider issues  
-✅ **Explainability**: Every decision has 100+ word business reasoning  
-✅ **Financial Impact**: Net profit >₹500, baseline is negative  
-✅ **Fraud Prevention**: Card testing and suspicious patterns caught (>90% detection)  
-✅ **False Positive Rate**: <5% unnecessary blocks on legitimate users  
-✅ **UI Clarity**: Non-technical person can understand dashboard in 30 seconds  
-✅ **Reliability**: Runs 10 times without crash  
-✅ **Demo-Readiness**: <3 minute pitch tells compelling story  
+✅ **Data Quality**: 2500 transactions, 4 clear patterns, ~200 failures (8% rate)
+✅ **Pattern Detection**: LLM finds all 4 traps consistently (whale, margin_destroyer, canary, weekend_vip)
+✅ **Preprocessing**: Python aggregates 2500 rows → 10-15 clusters, LLM sees summaries only
+✅ **Decision Variety**: Uses REROUTE, IGNORE, ALERT appropriately per pattern type
+✅ **Decision Quality**: >85% accuracy, no contradictory logic
+✅ **Explainability**: Every decision has 100+ word business reasoning
+✅ **Financial Impact**: Net profit >₹800, baseline loses ₹2,250 (300%+ improvement)
+✅ **Action Execution**: Agent sends REAL emails (not just logs "would send")
+✅ **Execution Logs**: `execution_log.json` shows all actions taken with timestamps
+✅ **Simulated Gateway**: Reroute simulator provides realistic responses with cost tracking
+✅ **File System Proof**: Config files updated, decisions logged to database/JSON
+✅ **UI Clarity**: Dashboard shows live action feed ("Email sent at 14:32:15")
+✅ **Reliability**: Runs 10 times without crash
+✅ **Demo-Readiness**: <3 minute pitch, judges receive email during demo  
 
 ---
 
