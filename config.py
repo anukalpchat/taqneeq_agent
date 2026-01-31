@@ -19,6 +19,18 @@ MIN_PATTERN_SIZE = 10                   # Minimum instances to consider a patter
 SPIKE_MULTIPLIER = 3.0                  # Failure rate must increase 3x to be a "spike"
 CONFIDENCE_THRESHOLD = 0.70             # Only execute actions if confidence >= 70%
 
+# Safety Constraints (Executor Agent)
+MAX_REROUTES_PER_HOUR = 500             # Capacity limit for rerouting
+MIN_NET_BENEFIT_THRESHOLD = 0.0         # REROUTE must have positive net benefit
+SAFETY_OVERRIDE_LOG = "data/refusals.json"
+
+# Execution Settings
+EXECUTION_LOG_PATH = "data/executions.json"
+EXECUTION_SUMMARY_PATH = "data/execution_summary.json"
+TRANSACTION_FLOW_PATH = "data/transaction_flow.json"
+ALERT_LOG_PATH = "data/alerts.log"
+SIMULATION_MODE = True                  # Set False for production execution
+
 # ============================================================================
 # DATA GENERATION SETTINGS
 # ============================================================================

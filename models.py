@@ -573,3 +573,119 @@ if __name__ == "__main__":
         print(f"   ✗ FAILED: {e}\n")
     
     print("🎉 Testing complete! Models are production-ready.\n")
+
+
+# ============================================================================
+# MODEL 4: ExecutionResult - Executor Agent Output Validation
+# ============================================================================
+
+class ExecutionResult(BaseModel):
+    """
+    Validates executor agent output - tracks actual execution results
+    """
+    id: int = Field(..., description="Execution sequence number")
+    pattern: str = Field(..., min_length=10, description="Pattern being addressed")
+    action: DecisionEnum = Field(..., description="Action taken")
+    status: str = Field(..., description="Execution status (SUCCESS, FAILED, SENT, LOGGED)")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Original decision confidence")
+    timestamp: datetime = Field(..., description="Execution timestamp")
+    
+    # Optional fields based on action type
+    from_provider: Optional[str] = Field(None, description="Original provider (for REROUTE)")
+    to_provider: Optional[str] = Field(None, description="Backup provider (for REROUTE)")
+    affected: int = Field(..., gt=0, description="Transactions affected")
+    successful: Optional[int] = Field(None, description="Successful transactions (for REROUTE)")
+    failed: Optional[int] = Field(None, description="Failed transactions (for REROUTE)")
+    
+    cost: float = Field(0.0, ge=0.0, description="Execution cost in rupees")
+    revenue: Optional[float] = Field(None, ge=0.0, description="Revenue recovered (for REROUTE)")
+    net: Optional[float] = Field(None, description="Net outcome (for REROUTE)")
+    
+    # Alert-specific fields
+    severity: Optional[str] = Field(None, description="Alert severity (for ALERT)")
+    message: Optional[str] = Field(None, description="Alert message (for ALERT)")
+    
+    # IGNORE-specific fields
+    capital_preserved: Optional[float] = Field(None, ge=0.0, description="Capital preserved (for IGNORE)")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "pattern": "HDFC Rewards >₹5,000",
+                "action": "REROUTE",
+                "status": "SUCCESS",
+                "confidence": 0.95,
+                "timestamp": "2026-02-01T01:45:30.350000",
+                "from_provider": "HDFC",
+                "to_provider": "Razorpay",
+                "affected": 35,
+                "successful": 33,
+                "failed": 2,
+                "cost": 525.00,
+                "revenue": 2821.55,
+                "net": 2296.55
+            }
+        }
+
+
+# ============================================================================
+# MODEL 5: SafetyOverride - Refused Decision Tracking
+# ============================================================================
+
+class SafetyOverride(BaseModel):
+    """
+    Tracks decisions refused by safety validator
+    """
+    pattern: str = Field(..., min_length=10, description="Pattern that was refused")
+    original_decision: DecisionEnum = Field(..., description="What Council recommended")
+    confidence: float = Field(..., ge=0.0, le=1.0, description="Original confidence score")
+    reason: str = Field(..., min_length=10, description="Why execution was refused")
+    affected: int = Field(..., gt=0, description="Transactions that would have been affected")
+    cost_avoided: float = Field(0.0, ge=0.0, description="Cost avoided by refusing")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "pattern": "Kotak low-confidence pattern",
+                "original_decision": "REROUTE",
+                "confidence": 0.45,
+                "reason": "Below 0.70 threshold",
+                "affected": 12,
+                "cost_avoided": 180.00
+            }
+        }
+
+
+# ============================================================================
+# MODEL 6: TransactionFlow - For Frontend Animation
+# ============================================================================
+
+class TransactionDetail(BaseModel):
+    """Individual transaction reroute result"""
+    id: str = Field(..., description="Transaction ID")
+    amount: float = Field(..., gt=0, description="Transaction amount")
+    status: str = Field(..., description="Reroute result (SUCCESS/FAILED)")
+    time_ms: int = Field(..., gt=0, description="Reroute time in milliseconds")
+
+
+class RerouteSession(BaseModel):
+    """Complete reroute session for visualization"""
+    session_id: int = Field(..., description="Session sequence number")
+    pattern: str = Field(..., description="Pattern being addressed")
+    from_provider: str = Field(..., description="Original provider")
+    to_provider: str = Field(..., description="Backup provider")
+    transactions: List[TransactionDetail] = Field(..., description="Individual transaction results")
+    
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "session_id": 1,
+                "pattern": "HDFC Rewards >₹5K",
+                "from_provider": "HDFC",
+                "to_provider": "Razorpay",
+                "transactions": [
+                    {"id": "TXN00142", "amount": 8542.30, "status": "SUCCESS", "time_ms": 245}
+                ]
+            }
+        }
