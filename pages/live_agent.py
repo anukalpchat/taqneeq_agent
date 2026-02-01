@@ -9,22 +9,13 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 from groq import Groq
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 from email_utils import send_daily_summary
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-=======
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from forex_utils import convert_to_inr, get_currency_symbol, format_conversion
->>>>>>> Stashed changes
-=======
-import sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from forex_utils import convert_to_inr, get_currency_symbol, format_conversion
->>>>>>> Stashed changes
 
 # Load environment variables
 load_dotenv()
@@ -847,15 +838,7 @@ with col_decision:
             alt_bank = ALTERNATE_BANKS.get(txn['bank'], 'HDFC')
             arrow_html = f'<div class="arrow-container" style="margin: 1rem 0;"><span style="color:#ff6b6b; font-weight:700; font-size: 1.2rem;">{txn["bank"]}</span><span class="flow-arrow" style="font-size: 1.6rem;"> → → → </span><span style="color:#51cf66; font-weight:700; font-size: 1.2rem;">{alt_bank}</span></div>'
         
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">₹{txn["amount"]:,.2f}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div><div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
-=======
         decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">🧠 AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">📋 TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">{amount_display}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div>{forex_html}<div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
->>>>>>> Stashed changes
-=======
-        decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">🧠 AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">📋 TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">{amount_display}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div>{forex_html}<div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
->>>>>>> Stashed changes
     
     elif st.session_state.demo_running:
         decision_html = '<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ffd43b;"><div style="text-align:center;"><div style="font-size: 1.3rem;">Processing...</div></div></div></div>'
