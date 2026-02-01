@@ -1,8 +1,5 @@
 """
-SENTINEL Live Demo - Real-Time Agentic Payment Routing
-========================================================
-Shows the AI agent processing transactions in real-time,
-making decisions, and rerouting failed payments.
+Live Agent in Action - Real-Time Transaction Processing
 """
 import streamlit as st
 import json
@@ -15,16 +12,6 @@ from groq import Groq
 
 # Load environment variables
 load_dotenv()
-
-# ════════════════════════════════════════════════════════
-#  PAGE CONFIG
-# ════════════════════════════════════════════════════════
-st.set_page_config(
-    layout="wide",
-    page_title="SENTINEL Live Demo",
-    page_icon="🎯",
-    initial_sidebar_state="collapsed",
-)
 
 # ════════════════════════════════════════════════════════
 #  CONSTANTS
@@ -446,157 +433,14 @@ if 'total_cost' not in st.session_state:
 
 
 # ════════════════════════════════════════════════════════
-#  LOAD HISTORICAL ANALYSIS DATA
-# ════════════════════════════════════════════════════════
-@st.cache_data
-def load_historical_analysis():
-    """Load the completed analysis from decisions.json"""
-    try:
-        with open("data/decisions.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    except:
-        return None
-
-# ════════════════════════════════════════════════════════
 #  MAIN UI
 # ════════════════════════════════════════════════════════
-st.markdown('<div class="demo-title">🎯 SENTINEL Live Demo</div>', unsafe_allow_html=True)
-st.markdown('<div class="demo-subtitle">Real-Time Agentic Payment Routing • Powered by Llama 3.3 70B</div>', unsafe_allow_html=True)
-
-# ════════════════════════════════════════════════════════
-#  HISTORICAL ANALYSIS SECTION (Collapsible)
-# ════════════════════════════════════════════════════════
-historical_data = load_historical_analysis()
-
-with st.expander("📊 Historical Analysis: Today's Full Dataset (2,500 Transactions)", expanded=False):
-    if historical_data:
-        decisions = historical_data.get("decisions", [])
-        metadata = historical_data.get("metadata", {})
-        
-        # Calculate metrics
-        total_patterns = len(decisions)
-        reroutes = sum(1 for d in decisions if d.get("decision") == "REROUTE")
-        ignores = sum(1 for d in decisions if d.get("decision") == "IGNORE")
-        alerts = sum(1 for d in decisions if d.get("decision") == "ALERT")
-        
-        # Calculate financial impact
-        total_cost = 0
-        total_revenue = 0
-        for d in decisions:
-            cost_str = d.get("cost_analysis", "")
-            # Parse: "Reroute cost: ₹525 (35×₹15). Revenue saved: ₹2,821.19"
-            if "₹" in cost_str:
-                parts = cost_str.split(".")
-                for part in parts:
-                    if "cost: ₹" in part:
-                        try:
-                            cost_val = float(part.split("₹")[1].split()[0].replace(",", ""))
-                            total_cost += cost_val
-                        except: pass
-                    if "Revenue saved: ₹" in part or "saved: ₹" in part:
-                        try:
-                            rev_val = float(part.split("₹")[-1].split()[0].replace(",", ""))
-                            total_revenue += rev_val
-                        except: pass
-        
-        net_profit = total_revenue - total_cost
-        baseline_profit = -2250.0  # From your data
-        roi = ((net_profit - baseline_profit) / abs(baseline_profit)) * 100 if baseline_profit else 0
-        
-        # Overview metrics
-        st.markdown("### 📈 Analysis Overview")
-        col1, col2, col3, col4, col5 = st.columns(5)
-        
-        with col1:
-            st.metric("Transactions Analyzed", "2,500")
-        with col2:
-            st.metric("Patterns Discovered", total_patterns)
-        with col3:
-            st.metric("Net Profit", f"₹{net_profit:,.0f}", delta=f"{roi:.0f}% ROI")
-        with col4:
-            st.metric("Inference Time", f"{metadata.get('inference_time_seconds', 0)}s")
-        with col5:
-            st.metric("Model", "Llama 3.3 70B")
-        
-        st.markdown("---")
-        
-        # Pattern Summary Table
-        st.markdown("### 🧠 Pattern Detection Summary")
-        
-        import pandas as pd
-        pattern_rows = []
-        for d in decisions:
-            # Parse net from cost_analysis
-            cost_str = d.get("cost_analysis", "")
-            net_val = 0
-            if "Net:" in cost_str:
-                try:
-                    net_part = cost_str.split("Net:")[-1].strip()
-                    net_val = float(net_part.replace("₹", "").replace(",", "").replace("+", "").split()[0])
-                except: pass
-            
-            pattern_rows.append({
-                "Pattern": d.get("pattern_detected", ""),
-                "Decision": d.get("decision", ""),
-                "Volume": d.get("affected_volume", 0),
-                "Avg Amount": f"₹{d.get('avg_amount', 0):,.0f}",
-                "Net Impact": f"₹{net_val:,.0f}",
-                "Confidence": f"{d.get('confidence', 0)*100:.0f}%"
-            })
-        
-        df = pd.DataFrame(pattern_rows)
-        st.dataframe(df, use_container_width=True, hide_index=True)
-        
-        st.markdown("---")
-        
-        # Financial breakdown
-        col_fin1, col_fin2 = st.columns(2)
-        
-        with col_fin1:
-            st.markdown("### 💰 Financial Breakdown")
-            st.metric("Total Reroute Cost", f"₹{total_cost:,.0f}", delta="Investment", delta_color="inverse")
-            st.metric("Revenue Saved", f"₹{total_revenue:,.0f}", delta="Recovered")
-            st.metric("Net Profit", f"₹{net_profit:,.0f}", delta=f"+{(net_profit/total_cost*100):.0f}% Return")
-        
-        with col_fin2:
-            st.markdown("### 📊 Decision Distribution")
-            decision_data = {
-                "Decision": ["REROUTE", "IGNORE", "ALERT"],
-                "Count": [reroutes, ignores, alerts]
-            }
-            
-            import plotly.graph_objects as go
-            fig = go.Figure(data=[go.Pie(
-                labels=decision_data["Decision"],
-                values=decision_data["Count"],
-                hole=0.4,
-                marker=dict(colors=["#51cf66", "#868e96", "#ffd43b"])
-            )])
-            fig.update_layout(
-                height=250,
-                margin=dict(l=20, r=20, t=20, b=20),
-                paper_bgcolor="rgba(0,0,0,0)",
-                plot_bgcolor="rgba(0,0,0,0)",
-                font=dict(color="#fff", size=12),
-                showlegend=True
-            )
-            st.plotly_chart(fig, use_container_width=True)
-        
-        st.info(f"📌 **Key Insight:** SENTINEL analyzed a full day's payment data ({metadata.get('total_decisions', 10)} patterns from 2,500 transactions) and generated ₹{net_profit:,.0f} profit in {metadata.get('inference_time_seconds', 0)}s using autonomous AI decision-making.")
-    else:
-        st.warning("⚠️ Historical analysis data not found. Run `python council_agent.py` first to generate decisions.json")
-
-st.markdown("---")
+st.title("⚡ Live Agent in Action")
+st.markdown("Watch SENTINEL process failed transactions in real-time and make autonomous routing decisions.")
 
 # Load transactions
 all_transactions = load_transactions()
 failed_txns = get_failed_transactions(all_transactions, limit=30)
-
-# ════════════════════════════════════════════════════════
-#  LIVE DEMO SECTION
-# ════════════════════════════════════════════════════════
-st.markdown("## ⚡ Live Agent in Action")
-st.markdown("Watch SENTINEL process failed transactions in real-time and make autonomous routing decisions.")
 
 # Control buttons
 col_ctrl1, col_ctrl2, col_ctrl3, col_ctrl4 = st.columns([1, 1, 1, 1])
