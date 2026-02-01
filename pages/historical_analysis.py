@@ -71,7 +71,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("📊 Historical Analysis")
+st.title("Historical Analysis")
 st.markdown("### Complete Day Analysis: 2,500 Transactions Processed")
 st.markdown("---")
 
@@ -139,7 +139,7 @@ if historical_data:
     st.markdown("---")
     
     # --- PATTERN DETECTION SUMMARY ---
-    st.markdown("## 🔍 Pattern Detection Summary")
+    st.markdown("## Pattern Detection Summary")
     
     pattern_rows = []
     for d in decisions:
@@ -164,12 +164,29 @@ if historical_data:
         })
     
     df = pd.DataFrame(pattern_rows)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    
+    # Apply styling: orange for first Decision cell (B2), light green for entire Temporal Signal column
+    def highlight_cells(val, row_idx, col_name):
+        # Color first Decision cell orange (B2 - first data row)
+        if col_name == 'Decision' and row_idx == 0:
+            return 'background-color: #ff9800; color: white; font-weight: 600'
+        # Color entire Temporal Signal column light green
+        elif col_name == 'Temporal Signal':
+            return 'background-color: #90ee90; color: black; font-weight: 600'
+        else:
+            return ''
+    
+    styled_df = df.style.apply(lambda x: [highlight_cells(val, i, x.name) for i, val in enumerate(x)], axis=0).set_properties(**{
+        'background-color': '#1f2937',
+        'color': '#e5e7eb',
+        'border-color': '#374151'
+    })
+    st.dataframe(styled_df, use_container_width=True, hide_index=True)
     
     st.markdown("---")
     
     # --- PROBLEM ANALYSIS ---
-    st.markdown("## 🚨 Problem Analysis: What Went Wrong?")
+    st.markdown("## Problem Analysis: What Went Wrong?")
     
     # Load raw transactions for richer analysis
     @st.cache_data

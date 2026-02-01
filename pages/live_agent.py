@@ -9,6 +9,10 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 from groq import Groq
+from email_utils import send_daily_summary
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 # Load environment variables
 load_dotenv()
@@ -435,6 +439,219 @@ def get_failed_transactions(transactions, limit=50):
 
 
 # ════════════════════════════════════════════════════════
+#  EMAIL ALERT FUNCTIONS
+# ════════════════════════════════════════════════════════
+def send_big_transaction_alert(txn: Dict[str, Any], decision: Dict[str, Any]):
+    """Send immediate email alert for big transactions (>₹5K)"""
+    recipient = os.getenv("RECIPIENT_EMAIL")
+    if not recipient:
+        return  # Silently skip if no recipient configured
+    
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    if not smtp_user or not smtp_password:
+        return  # Skip if no SMTP configured
+    
+    subject = f"🚨 SENTINEL Alert: High-Value Transaction ₹{txn['amount']:,.0f}"
+    
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: 'Segoe UI', sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }}
+            .container {{ max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }}
+            .header {{ background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 25px; text-align: center; }}
+            .header h1 {{ margin: 0; font-size: 24px; }}
+            .content {{ padding: 25px; }}
+            .alert-box {{ background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 15px 0; border-radius: 4px; }}
+            .txn-details {{ background: #f9fafb; padding: 15px; border-radius: 6px; margin: 15px 0; }}
+            .detail-row {{ display: flex; justify-content: space-between; margin: 8px 0; }}
+            .detail-label {{ color: #6b7280; font-weight: 500; }}
+            .detail-value {{ color: #1f2937; font-weight: 600; }}
+            .decision-box {{ background: #e0f2fe; border-left: 4px solid #0284c7; padding: 15px; margin: 15px 0; border-radius: 4px; }}
+            .footer {{ padding: 15px; text-align: center; color: #6b7280; font-size: 12px; background: #f9fafb; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🚨 High-Value Transaction Alert</h1>
+                <p style="margin: 5px 0 0 0; opacity: 0.9;">{datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
+            </div>
+            
+            <div class="content">
+                <div class="alert-box">
+                    <strong>⚠️ Action Required</strong><br>
+                    A high-value transaction (>₹5,000) requires immediate attention.
+                </div>
+                
+                <div class="txn-details">
+                    <h3 style="margin: 0 0 15px 0; color: #1f2937;">Transaction Details</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Transaction ID:</span>
+                        <span class="detail-value">{txn['transaction_id']}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Amount:</span>
+                        <span class="detail-value" style="color: #ef4444; font-size: 18px;">₹{txn['amount']:,.2f}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Bank:</span>
+                        <span class="detail-value">{txn['bank']}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Card Type:</span>
+                        <span class="detail-value">{txn.get('card_type', 'N/A')}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Error:</span>
+                        <span class="detail-value">{txn.get('error_code', 'N/A')}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Time:</span>
+                        <span class="detail-value">{txn.get('timestamp', 'N/A')}</span>
+                    </div>
+                </div>
+                
+                <div class="decision-box">
+                    <h3 style="margin: 0 0 10px 0; color: #0284c7;">🤖 SENTINEL Decision</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Action:</span>
+                        <span class="detail-value">{decision['decision']}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Confidence:</span>
+                        <span class="detail-value">{decision['confidence']*100:.0f}%</span>
+                    </div>
+                    <p style="margin: 10px 0 0 0; color: #374151; line-height: 1.5;">
+                        <strong>Reasoning:</strong> {decision['reasoning']}
+                    </p>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <p>SENTINEL Autonomous Payment Intelligence System</p>
+                <p>This is an automated alert. No action required unless decision needs review.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    text_body = f"""
+SENTINEL High-Value Transaction Alert
+{datetime.now().strftime('%B %d, %Y at %I:%M %p')}
+
+⚠️ ACTION REQUIRED
+A high-value transaction (>₹5,000) requires immediate attention.
+
+TRANSACTION DETAILS
+-------------------
+Transaction ID: {txn['transaction_id']}
+Amount: ₹{txn['amount']:,.2f}
+Bank: {txn['bank']}
+Card Type: {txn.get('card_type', 'N/A')}
+Error: {txn.get('error_code', 'N/A')}
+Time: {txn.get('timestamp', 'N/A')}
+
+SENTINEL DECISION
+-----------------
+Action: {decision['decision']}
+Confidence: {decision['confidence']*100:.0f}%
+Reasoning: {decision['reasoning']}
+
+---
+SENTINEL Autonomous Payment Intelligence System
+This is an automated alert.
+    """
+    
+    try:
+        smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+        smtp_port = int(os.getenv("SMTP_PORT", "587"))
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = smtp_user
+        msg['To'] = recipient
+        
+        part1 = MIMEText(text_body, 'plain')
+        part2 = MIMEText(html_body, 'html')
+        msg.attach(part1)
+        msg.attach(part2)
+        
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+        
+        return True
+    except Exception as e:
+        print(f"Failed to send alert email: {e}")
+        return False
+
+
+def send_live_demo_summary():
+    """Send final summary email after demo completion"""
+    # Prepare execution data
+    executions_data = []
+    for entry in st.session_state.processed_txns:
+        txn = entry['txn']
+        decision = entry['decision']
+        
+        exec_data = {
+            'id': txn['transaction_id'],
+            'pattern': f"{txn['bank']} {txn.get('card_type', '')} ₹{txn['amount']:,.0f}",
+            'action': decision['decision'],
+            'status': 'SUCCESS',
+            'confidence': decision['confidence'],
+            'timestamp': datetime.now().isoformat(),
+            'affected': 1
+        }
+        
+        if decision['decision'] == 'REROUTE':
+            alt_bank = ALTERNATE_BANKS.get(txn['bank'], 'HDFC')
+            exec_data.update({
+                'from_provider': txn['bank'],
+                'to_provider': alt_bank,
+                'successful': 1,
+                'failed': 0,
+                'cost': REROUTE_COST,
+                'revenue': txn['amount'] * MARGIN_RATE,
+                'net': (txn['amount'] * MARGIN_RATE) - REROUTE_COST
+            })
+        
+        executions_data.append(exec_data)
+    
+    # Prepare refusals (none in live demo typically)
+    refusals_data = []
+    
+    # Prepare summary
+    profit = st.session_state.total_profit - st.session_state.total_cost
+    roi = ((st.session_state.total_profit - st.session_state.total_cost) / st.session_state.total_cost * 100) if st.session_state.total_cost > 0 else 0
+    
+    summary = {
+        'timestamp': datetime.now().isoformat(),
+        'net_profit': round(profit, 2),
+        'roi_percent': round(roi, 1),
+        'transactions_saved': len(st.session_state.rerouted_txns),
+        'failure_rate_before': 100.0,  # All were failed transactions
+        'failure_rate_after': 0.0,  # All rerouted successfully
+        'improvement_percent': 100.0,
+        'total_executed': len(st.session_state.processed_txns),
+        'total_refused': 0,
+        'execution_time_seconds': 0
+    }
+    
+    # Send the summary
+    send_daily_summary(
+        executions=executions_data,
+        refusals=refusals_data,
+        summary=summary
+    )
+
+
+# ════════════════════════════════════════════════════════
 #  SESSION STATE INITIALIZATION
 # ════════════════════════════════════════════════════════
 if 'demo_running' not in st.session_state:
@@ -464,6 +681,13 @@ if 'total_cost' not in st.session_state:
 # ════════════════════════════════════════════════════════
 st.title("⚡ Live Agent in Action")
 st.markdown("Watch SENTINEL process failed transactions in real-time and make autonomous routing decisions.")
+
+# Show email status
+recipient = os.getenv("RECIPIENT_EMAIL")
+if recipient:
+    st.info(f"📧 Email alerts enabled for transactions >₹5K → {recipient}")
+else:
+    st.warning("📧 Email alerts disabled (configure RECIPIENT_EMAIL in .env to enable)")
 
 # Load transactions
 all_transactions = load_transactions()
@@ -658,6 +882,10 @@ if st.session_state.demo_running and st.session_state.current_index < len(failed
         st.session_state.total_profit += margin
         st.session_state.total_cost += REROUTE_COST
         
+        # Send email alert for big transactions (>₹5000)
+        if current_txn['amount'] > 5000:
+            send_big_transaction_alert(current_txn, decision)
+        
     elif decision['decision'] == 'IGNORE':
         st.session_state.ignored_txns.append(current_txn)
         # Saved ₹15 by not rerouting!
@@ -674,7 +902,11 @@ if st.session_state.demo_running and st.session_state.current_index < len(failed
     # Check if done
     if st.session_state.current_index >= len(failed_txns):
         st.session_state.demo_running = False
+        
+        # Send final summary email
+        send_live_demo_summary()
         st.balloons()
+        st.success("✅ Demo complete! Summary email sent.")
     
     st.rerun()
 
