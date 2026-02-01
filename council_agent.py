@@ -11,8 +11,8 @@ Architecture: Single LLM call with three embedded perspectives:
 import os
 import json
 import time
-from datetime import datetime
-from typing import List, Dict, Any, Optional
+from datetime import datetime, timedelta
+from typing import List, Dict, Any, Optional, Tuple
 from pathlib import Path
 
 import pandas as pd
@@ -39,6 +39,9 @@ if not api_key:
     raise ValueError("Missing API key. Set GROQ_API_KEY in .env file")
 client = Groq(api_key=api_key)
 
+# Pattern history tracking
+PATTERN_HISTORY_PATH = "data/pattern_history.json"
+
 
 class CouncilAgent:
     """
@@ -51,6 +54,8 @@ class CouncilAgent:
         self.client = client
         self.decisions: List[AgentDecision] = []
         self.metrics: Optional[PerformanceMetrics] = None
+        self.pattern_history = self._load_pattern_history()
+        self.calibrations: List[Dict[str, Any]] = []
         
     def analyze_failures(self, transactions_path: str = "data/transactions.json") -> Dict[str, Any]:
         """
@@ -108,8 +113,12 @@ class CouncilAgent:
         # Store clusters for accurate profit calculations
         self.analyzed_clusters = top_clusters
         
+        print(f"\n📊 Calibrating confidence baselines...")
+        calibrations = self._calibrate_confidence(top_clusters)
+        print(f"   ✓ Calibrated {len(calibrations)} patterns")
+        
         print(f"\n🧠 Analyzing patterns with {LLM_MODEL}...")
-        decisions = self._analyze_with_llm(top_clusters)
+        decisions = self._analyze_with_llm(top_clusters, calibrations)
         print(f"   ✓ LLM call completed ({time.time() - start_time:.1f}s)")
         print(f"   ✓ Received {len(decisions)} decisions")
         
@@ -246,11 +255,15 @@ class CouncilAgent:
         
         return ranked[:max_clusters]
     
-    def _build_system_prompt(self) -> str:
+    def _build_system_prompt(self, confidence_briefing: Optional[str] = None) -> str:
         """
         Construct the multi-persona system prompt
         """
-        return f"""You are the SENTINEL Council - a payment operations decision system with two expert advisors and one moderator.
+        confidence_context = ""
+        if confidence_briefing:
+            confidence_context = f"\n\n## CONFIDENCE CALIBRATION BRIEFING\n\n{confidence_briefing}\n\nThis briefing reflects the system's historical performance on similar patterns. Factor this into your confidence scoring."
+        
+        return f"""You are the SENTINEL Council - a payment operations decision system with two expert advisors and one moderator.{confidence_context}
 
 ## COUNCIL STRUCTURE
 
@@ -522,12 +535,16 @@ As the council system, you must:
 
 Now analyze these failure clusters and return your council's structured decisions."""
 
-    def _analyze_with_llm(self, clusters: List[FailureCluster]) -> List[Dict[str, Any]]:
+    def _analyze_with_llm(self, clusters: List[FailureCluster], calibrations: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """
-        Send clusters to Gemini for analysis
+        Send clusters to LLM for analysis with confidence calibration
         """
-        # Build system prompt
-        system_prompt = self._build_system_prompt()
+        # Aggregate confidence briefings
+        briefings = [cal.get("council_briefing", "") for cal in calibrations if cal.get("council_briefing")]
+        confidence_briefing = "\n".join([f"• {b}" for b in briefings]) if briefings else None
+        
+        # Build system prompt with calibration context
+        system_prompt = self._build_system_prompt(confidence_briefing)
         
         # Build user message (clusters as JSON)
         clusters_json = json.dumps([c.model_dump() for c in clusters], indent=2)
@@ -708,6 +725,265 @@ Return a JSON array of decisions following the format specified in the system pr
                 return cluster
         
         return None
+    
+    def _load_pattern_history(self) -> Dict[str, Dict[str, Any]]:
+        """Load pattern history from disk or create empty structure"""
+        Path("data").mkdir(exist_ok=True)
+        
+        if os.path.exists(PATTERN_HISTORY_PATH):
+            with open(PATTERN_HISTORY_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        
+        return {}
+    
+    def _save_pattern_history(self):
+        """Persist pattern history to disk"""
+        with open(PATTERN_HISTORY_PATH, 'w', encoding='utf-8') as f:
+            json.dump(self.pattern_history, f, indent=2, ensure_ascii=False)
+    
+    def _classify_pattern_type(self, cluster: FailureCluster) -> str:
+        """Classify cluster into pattern type category"""
+        pattern_text = f"{cluster.bank} {cluster.card_type} {cluster.amount_range} {cluster.failure_rate}".lower()
+        
+        # Spike detection: high failure rate in short time window
+        if cluster.failure_rate > 0.7 and "spike" in pattern_text:
+            return "bank_spike"
+        
+        # Micro transactions: very low amounts
+        if "<100" in cluster.amount_range or "<200" in cluster.amount_range:
+            return "micro_transaction"
+        
+        # VIP anomaly: high value transactions
+        if ">5000" in cluster.amount_range or cluster.avg_amount > 5000:
+            return "vip_anomaly"
+        
+        # Card testing: many small failures
+        if cluster.count > 50 and cluster.failure_rate > 0.8:
+            return "card_testing"
+        
+        # High risk: specific error codes or patterns
+        if "fraud" in pattern_text or "security" in pattern_text:
+            return "high_risk_payment"
+        
+        # Default: general payment failure
+        return "payment_failure"
+    
+    def _calibrate_confidence(self, clusters: List[FailureCluster]) -> List[Dict[str, Any]]:
+        """
+        Run confidence calibration for each cluster based on historical performance
+        """
+        calibrations = []
+        current_time = datetime.now()
+        
+        for idx, cluster in enumerate(clusters):
+            pattern_id = f"PAT-{cluster.bank}-{cluster.card_type}-{idx:04d}"
+            pattern_type = self._classify_pattern_type(cluster)
+            
+            # Get or create history for this pattern type
+            if pattern_type not in self.pattern_history:
+                self.pattern_history[pattern_type] = {
+                    "pattern_type": pattern_type,
+                    "total_occurrences": 0,
+                    "predictions_correct": 0,
+                    "predictions_wrong": 0,
+                    "prediction_accuracy": None,
+                    "average_resolution_time_minutes": None,
+                    "last_seen_timestamp": None,
+                    "last_outcome": None,
+                    "second_to_last_outcome": None,
+                    "current_confidence_modifier": 1.0,
+                    "confidence_adjustment_log": []
+                }
+            
+            history = self.pattern_history[pattern_type]
+            
+            # Calculate calibration
+            calibration = self._apply_calibration_rules(
+                pattern_id,
+                pattern_type,
+                cluster,
+                history,
+                current_time
+            )
+            
+            calibrations.append(calibration)
+            self.calibrations.append(calibration)
+        
+        # Save updated history
+        self._save_pattern_history()
+        
+        return calibrations
+    
+    def _apply_calibration_rules(
+        self,
+        pattern_id: str,
+        pattern_type: str,
+        cluster: FailureCluster,
+        history: Dict[str, Any],
+        current_time: datetime
+    ) -> Dict[str, Any]:
+        """
+        Apply calibration rules to determine confidence baseline
+        """
+        rules_applied = []
+        rule_overrides = []
+        
+        # Assume pattern was just detected (time_since = 0 for new patterns)
+        time_since_first_detected_minutes = 0
+        
+        base_modifier = history["current_confidence_modifier"]
+        previous_modifier = base_modifier
+        
+        # RULE 1: FRESH PATTERN OVERRIDE
+        if history["total_occurrences"] <= 2:
+            base_modifier = 0.80
+            rules_applied.append("RULE_1")
+            rule_overrides.append("RULE_1 overrode RULE_2, RULE_3, RULE_4")
+            reasoning = f"Rule 1 triggered. Total occurrences is {history['total_occurrences']} — pattern type has insufficient history. Base modifier set to 0.80 per fresh pattern override."
+            briefing = f"This pattern type ({pattern_type}) has been seen {history['total_occurrences']} times. Insufficient history to calibrate. Approach with standard caution."
+        
+        # RULE 2: STALENESS RESET
+        elif history["last_seen_timestamp"]:
+            last_seen = datetime.fromisoformat(history["last_seen_timestamp"])
+            hours_since = (current_time - last_seen).total_seconds() / 3600
+            
+            if hours_since > 48:
+                base_modifier = 1.0
+                rules_applied.append("RULE_2")
+                rule_overrides.append("RULE_2 overrode RULE_3, RULE_4")
+                reasoning = f"Rule 2 triggered. Last seen {hours_since:.1f} hours ago (>{48}h threshold). History too old, conditions likely changed. Resetting to 1.0."
+                briefing = f"Pattern type hasn't occurred in {hours_since:.0f} hours. Starting fresh — old data may not be relevant."
+            else:
+                # RULE 3: PREDICTION ACCURACY MODIFIER
+                base_modifier = self._apply_rule_3(base_modifier, history, rules_applied)
+                
+                # RULE 4: CONSECUTIVE MISS PENALTY
+                base_modifier = self._apply_rule_4(base_modifier, history, rules_applied)
+                
+                reasoning = self._build_calibration_reasoning(history, rules_applied, base_modifier, previous_modifier)
+                briefing = self._build_council_briefing(history, pattern_type)
+        else:
+            # First time seeing this pattern type
+            base_modifier = 0.80
+            rules_applied.append("RULE_1")
+            rule_overrides.append("RULE_1 overrode RULE_2, RULE_3, RULE_4")
+            reasoning = "Rule 1 triggered. Pattern type never seen before. Starting with 0.80 baseline."
+            briefing = f"First occurrence of {pattern_type}. No track record to reference. Approach with standard caution."
+        
+        # Apply staleness decay
+        staleness_decay = self._calculate_staleness_decay(time_since_first_detected_minutes)
+        final_confidence_baseline = base_modifier * staleness_decay
+        
+        # Apply confidence floor
+        confidence_floor_hit = False
+        if final_confidence_baseline < 0.40:
+            final_confidence_baseline = 0.40
+            confidence_floor_hit = True
+        
+        # Determine if rescan needed
+        needs_rescan = staleness_decay <= 0.70 or final_confidence_baseline <= 0.50
+        
+        return {
+            "calibration_id": f"CAL-{pattern_id}-{int(current_time.timestamp())}",
+            "pattern_id": pattern_id,
+            "pattern_type": pattern_type,
+            "rules_applied": rules_applied,
+            "rule_overrides": rule_overrides,
+            "base_modifier": round(base_modifier, 2),
+            "staleness_decay": round(staleness_decay, 2),
+            "final_confidence_baseline": round(final_confidence_baseline, 2),
+            "confidence_floor_hit": confidence_floor_hit,
+            "needs_rescan": needs_rescan,
+            "reasoning": reasoning,
+            "council_briefing": briefing,
+            "adjustment_log_entry": {
+                "timestamp": current_time.isoformat(),
+                "pattern_type": pattern_type,
+                "previous_modifier": round(previous_modifier, 2),
+                "new_modifier": round(base_modifier, 2),
+                "reason": " + ".join(rules_applied) if rules_applied else "No change"
+            }
+        }
+    
+    def _apply_rule_3(self, base_modifier: float, history: Dict[str, Any], rules_applied: List[str]) -> float:
+        """Apply prediction accuracy modifier"""
+        accuracy = history.get("prediction_accuracy")
+        
+        if accuracy is None or history["total_occurrences"] == 0:
+            return base_modifier
+        
+        rules_applied.append("RULE_3")
+        
+        if accuracy >= 0.85:
+            return base_modifier  # No change
+        elif accuracy >= 0.70:
+            return base_modifier * 0.92
+        elif accuracy >= 0.50:
+            return base_modifier * 0.80
+        else:
+            return base_modifier * 0.65
+    
+    def _apply_rule_4(self, base_modifier: float, history: Dict[str, Any], rules_applied: List[str]) -> float:
+        """Apply consecutive miss penalty"""
+        last = history.get("last_outcome")
+        second_last = history.get("second_to_last_outcome")
+        
+        if last == "prediction_miss" and second_last == "prediction_miss":
+            rules_applied.append("RULE_4")
+            return base_modifier * 0.70
+        elif last == "prediction_miss":
+            rules_applied.append("RULE_4")
+            return base_modifier * 0.88
+        
+        return base_modifier
+    
+    def _calculate_staleness_decay(self, minutes: int) -> float:
+        """Calculate time-based decay factor"""
+        if minutes <= 15:
+            return 1.0
+        elif minutes <= 30:
+            return 0.95
+        elif minutes <= 60:
+            return 0.85
+        elif minutes <= 120:
+            return 0.70
+        else:
+            return 0.55
+    
+    def _build_calibration_reasoning(
+        self,
+        history: Dict[str, Any],
+        rules_applied: List[str],
+        base_modifier: float,
+        previous_modifier: float
+    ) -> str:
+        """Build detailed reasoning for calibration decision"""
+        parts = []
+        
+        if "RULE_3" in rules_applied:
+            accuracy = history.get("prediction_accuracy", 0)
+            parts.append(f"Rule 3: Prediction accuracy is {accuracy:.1%}. Applied modifier.")
+        
+        if "RULE_4" in rules_applied:
+            if history.get("last_outcome") == "prediction_miss" and history.get("second_to_last_outcome") == "prediction_miss":
+                parts.append("Rule 4: Two consecutive misses detected. Severe penalty applied.")
+            else:
+                parts.append("Rule 4: Single recent miss. Moderate penalty applied.")
+        
+        parts.append(f"Base modifier adjusted from {previous_modifier:.2f} to {base_modifier:.2f}.")
+        
+        return " ".join(parts)
+    
+    def _build_council_briefing(self, history: Dict[str, Any], pattern_type: str) -> str:
+        """Build concise briefing for Council agents"""
+        accuracy = history.get("prediction_accuracy", 0)
+        occurrences = history.get("total_occurrences", 0)
+        last_outcome = history.get("last_outcome", "")
+        
+        if last_outcome == "prediction_miss":
+            return f"{pattern_type}: {accuracy:.0%} accuracy over {occurrences} occurrences. Recent miss detected — be cautious."
+        else:
+            return f"{pattern_type}: {accuracy:.0%} accuracy over {occurrences} occurrences. Track record is {'strong' if accuracy > 0.8 else 'moderate'}."
     
     def _save_results(
         self,

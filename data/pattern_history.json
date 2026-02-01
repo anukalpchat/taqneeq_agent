@@ -1,0 +1,28 @@
+{
+  "vip_anomaly": {
+    "pattern_type": "vip_anomaly",
+    "total_occurrences": 0,
+    "predictions_correct": 0,
+    "predictions_wrong": 0,
+    "prediction_accuracy": null,
+    "average_resolution_time_minutes": null,
+    "last_seen_timestamp": null,
+    "last_outcome": null,
+    "second_to_last_outcome": null,
+    "current_confidence_modifier": 1.0,
+    "confidence_adjustment_log": []
+  },
+  "payment_failure": {
+    "pattern_type": "payment_failure",
+    "total_occurrences": 0,
+    "predictions_correct": 0,
+    "predictions_wrong": 0,
+    "prediction_accuracy": null,
+    "average_resolution_time_minutes": null,
+    "last_seen_timestamp": null,
+    "last_outcome": null,
+    "second_to_last_outcome": null,
+    "current_confidence_modifier": 1.0,
+    "confidence_adjustment_log": []
+  }
+}

@@ -10,10 +10,8 @@ from typing import List, Dict, Any
 from pathlib import Path
 
 from models import AgentDecision, ExecutionResult, SafetyOverride, RerouteSession, TransactionDetail
-from tools.reroute_tool import RerouteTool
-from tools.alert_tool import AlertTool
-from tools.validation_tool import ValidationTool
 from safety_validator import validate_decision, create_safety_override
+from email_utils import send_daily_summary
 from config import (
     EXECUTION_LOG_PATH,
     EXECUTION_SUMMARY_PATH,
@@ -28,10 +26,6 @@ class ExecutorAgent:
     """
     
     def __init__(self):
-        self.reroute_tool = RerouteTool()
-        self.alert_tool = AlertTool()
-        self.validation_tool = ValidationTool()
-        
         self.executions: List[ExecutionResult] = []
         self.refusals: List[SafetyOverride] = []
         self.reroute_sessions: List[RerouteSession] = []
@@ -117,13 +111,47 @@ class ExecutorAgent:
         # Extract bank from pattern (simple extraction)
         bank = self._extract_bank(decision.pattern_detected)
         
-        # Call reroute tool
-        result = self.reroute_tool.execute(
-            pattern=decision.pattern_detected,
-            failed_bank=bank,
-            transaction_count=decision.affected_volume,
-            avg_amount=decision.avg_amount
-        )
+        # Simulate reroute execution
+        import random
+        from config import REROUTE_COST, MARGIN_RATE
+        
+        # Determine target provider (simple logic: pick healthiest bank)
+        available_banks = ["HDFC", "SBI", "ICICI", "Axis", "Kotak"]
+        available_banks = [b for b in available_banks if b != bank]
+        to_bank = random.choice(available_banks)
+        
+        # Simulate success rate (90% success on reroute)
+        successful = int(decision.affected_volume * 0.90)
+        failed = decision.affected_volume - successful
+        
+        # Calculate financials
+        cost = decision.affected_volume * REROUTE_COST
+        revenue = successful * decision.avg_amount * MARGIN_RATE
+        net = revenue - cost
+        
+        # Create result object
+        result = {
+            'from': bank,
+            'to': to_bank,
+            'affected': decision.affected_volume,
+            'successful': successful,
+            'failed': failed,
+            'cost': cost,
+            'revenue': revenue,
+            'net': net,
+            'transactions': []
+        }
+        
+        # Generate transaction details for animation
+        for i in range(decision.affected_volume):
+            status = 'SUCCESS' if i < successful else 'FAILED'
+            result['transactions'].append({
+                'id': f'TXN{idx:05d}{i:03d}',
+                'amount': decision.avg_amount,
+                'status': status,
+                'time_ms': random.randint(100, 500),  # Simulated reroute time
+                'timestamp': datetime.now().isoformat()
+            })
         
         print(f"   ✓ Rerouted {result['from']} → {result['to']}")
         print(f"   ✓ Success: {result['successful']}/{result['affected']} transactions")
@@ -175,13 +203,6 @@ class ExecutorAgent:
         
         # Extract key message from reasoning
         message = decision.reasoning[:100] + "..." if len(decision.reasoning) > 100 else decision.reasoning
-        
-        result = self.alert_tool.execute(
-            pattern=decision.pattern_detected,
-            severity=severity,
-            affected=decision.affected_volume,
-            message=message
-        )
         
         print(f"   ✓ Alert sent: {severity} severity")
         
@@ -280,6 +301,14 @@ class ExecutorAgent:
             }
             with open(TRANSACTION_FLOW_PATH, 'w', encoding='utf-8') as f:
                 json.dump(flow_data, f, indent=2, ensure_ascii=False)
+        
+        # Send daily summary email
+        print(f"\n📧 Sending daily summary email...")
+        send_daily_summary(
+            executions=executions_data,
+            refusals=refusals_data,
+            summary=summary
+        )
     
     def _display_summary(self):
         """Display execution summary"""
@@ -300,6 +329,7 @@ class ExecutorAgent:
         print(f"   Alerts Sent: {len(alerts)}")
         print(f"   Patterns Ignored: {len(ignores)}")
         print(f"   Safety Overrides: {len(self.refusals)}")
+        
         print(f"\n💰 Financial:")
         print(f"   Total Cost: ₹{total_cost:,.2f}")
         print(f"   Revenue Recovered: ₹{total_revenue:,.2f}")

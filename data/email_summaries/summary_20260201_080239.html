@@ -1,0 +1,213 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background-color: #f5f5f5;
+                margin: 0;
+                padding: 20px;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+            .header {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 30px;
+                text-align: center;
+            }
+            .header h1 {
+                margin: 0;
+                font-size: 28px;
+                font-weight: 600;
+            }
+            .header p {
+                margin: 5px 0 0 0;
+                opacity: 0.9;
+            }
+            .metrics {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                padding: 30px;
+                background-color: #f8f9fa;
+            }
+            .metric-card {
+                background: white;
+                padding: 20px;
+                border-radius: 6px;
+                text-align: center;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            .metric-value {
+                font-size: 32px;
+                font-weight: bold;
+                color: #667eea;
+                margin: 10px 0;
+            }
+            .metric-value.positive {
+                color: #10b981;
+            }
+            .metric-value.negative {
+                color: #ef4444;
+            }
+            .metric-label {
+                font-size: 14px;
+                color: #6b7280;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .section {
+                padding: 30px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .section h2 {
+                margin: 0 0 20px 0;
+                color: #1f2937;
+                font-size: 20px;
+            }
+            .action-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            .action-stat {
+                background: #f9fafb;
+                padding: 15px;
+                border-radius: 6px;
+                border-left: 4px solid #667eea;
+            }
+            .action-stat.reroute {
+                border-left-color: #3b82f6;
+            }
+            .action-stat.alert {
+                border-left-color: #f59e0b;
+            }
+            .action-stat.ignore {
+                border-left-color: #6b7280;
+            }
+            .action-stat .count {
+                font-size: 24px;
+                font-weight: bold;
+                color: #1f2937;
+            }
+            .action-stat .label {
+                font-size: 12px;
+                color: #6b7280;
+                text-transform: uppercase;
+            }
+            .execution-list {
+                list-style: none;
+                padding: 0;
+                margin: 20px 0;
+            }
+            .execution-item {
+                background: #f9fafb;
+                padding: 15px;
+                margin-bottom: 10px;
+                border-radius: 6px;
+                border-left: 4px solid #667eea;
+            }
+            .execution-item .pattern {
+                font-weight: 600;
+                color: #1f2937;
+                margin-bottom: 5px;
+            }
+            .execution-item .details {
+                font-size: 14px;
+                color: #6b7280;
+            }
+            .execution-item .outcome {
+                font-size: 14px;
+                color: #10b981;
+                margin-top: 5px;
+            }
+            .footer {
+                padding: 20px;
+                text-align: center;
+                color: #6b7280;
+                font-size: 12px;
+                background-color: #f9fafb;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🛡️ SENTINEL Daily Summary</h1>
+                <p>February 01, 2026 at 08:02 AM</p>
+            </div>
+            
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-label">Net Profit</div>
+                    <div class="metric-value positive">₹4,844</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Transactions Saved</div>
+                    <div class="metric-value">31</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Improvement</div>
+                    <div class="metric-value positive">31.0%</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>📊 Action Breakdown</h2>
+                <div class="action-grid">
+                    <div class="action-stat reroute">
+                        <div class="count">1</div>
+                        <div class="label">Reroutes</div>
+                    </div>
+                    <div class="action-stat alert">
+                        <div class="count">0</div>
+                        <div class="label">Alerts</div>
+                    </div>
+                    <div class="action-stat ignore">
+                        <div class="count">7</div>
+                        <div class="label">Ignored</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>🔀 Recent Reroutes</h2>
+                <ul class="execution-list">
+    
+                    <li class="execution-item">
+                        <div class="pattern">HDFC Rewards >5000 failing 14:00-16:00</div>
+                        <div class="details">HDFC → Axis | 31/35 succeeded</div>
+                        <div class="outcome">Net: ₹4,844</div>
+                    </li>
+        
+                </ul>
+            </div>
+    
+            <div class="section">
+                <h2>🛡️ Safety Overrides (1)</h2>
+                <ul class="execution-list">
+        
+                    <li class="execution-item" style="border-left-color: #ef4444;">
+                        <div class="pattern">ICICI Debit 1000-5000 failing 01:00-20:00</div>
+                        <div class="details">Confidence 0.60 below threshold 0.70</div>
+                    </li>
+            
+                </ul>
+            </div>
+        
+            <div class="footer">
+                <p>SENTINEL Autonomous Payment Intelligence System</p>
+                <p>Execution completed in 0.02 seconds</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    

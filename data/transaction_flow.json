@@ -4,407 +4,217 @@
       "session_id": 1,
       "pattern": "HDFC Rewards >5000 failing 14:00-16:00",
       "from_provider": "HDFC",
-      "to_provider": "Razorpay",
+      "to_provider": "SBI",
       "transactions": [
         {
-          "id": "TXN00000",
-          "amount": 10063.31,
+          "id": "TXN00001000",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 470
+        },
+        {
+          "id": "TXN00001001",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 417
+        },
+        {
+          "id": "TXN00001002",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 487
+        },
+        {
+          "id": "TXN00001003",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 443
+        },
+        {
+          "id": "TXN00001004",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 261
+        },
+        {
+          "id": "TXN00001005",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 375
+        },
+        {
+          "id": "TXN00001006",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 116
+        },
+        {
+          "id": "TXN00001007",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 385
+        },
+        {
+          "id": "TXN00001008",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 439
+        },
+        {
+          "id": "TXN00001009",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 213
+        },
+        {
+          "id": "TXN00001010",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 171
+        },
+        {
+          "id": "TXN00001011",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 122
+        },
+        {
+          "id": "TXN00001012",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 259
+        },
+        {
+          "id": "TXN00001013",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 199
+        },
+        {
+          "id": "TXN00001014",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 320
+        },
+        {
+          "id": "TXN00001015",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 450
+        },
+        {
+          "id": "TXN00001016",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 293
+        },
+        {
+          "id": "TXN00001017",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 427
+        },
+        {
+          "id": "TXN00001018",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 473
+        },
+        {
+          "id": "TXN00001019",
+          "amount": 8659.805714285716,
+          "status": "SUCCESS",
+          "time_ms": 309
+        },
+        {
+          "id": "TXN00001020",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
           "time_ms": 208
         },
         {
-          "id": "TXN00001",
-          "amount": 8992.67,
+          "id": "TXN00001021",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 333
+          "time_ms": 385
         },
         {
-          "id": "TXN00002",
-          "amount": 9761.91,
+          "id": "TXN00001022",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 240
+          "time_ms": 402
         },
         {
-          "id": "TXN00003",
-          "amount": 10000.28,
+          "id": "TXN00001023",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 257
+          "time_ms": 456
         },
         {
-          "id": "TXN00004",
-          "amount": 8686.71,
-          "status": "SUCCESS",
-          "time_ms": 208
-        },
-        {
-          "id": "TXN00005",
-          "amount": 8345.68,
-          "status": "SUCCESS",
-          "time_ms": 277
-        },
-        {
-          "id": "TXN00006",
-          "amount": 7238.17,
-          "status": "SUCCESS",
-          "time_ms": 348
-        },
-        {
-          "id": "TXN00007",
-          "amount": 7809.68,
-          "status": "SUCCESS",
-          "time_ms": 252
-        },
-        {
-          "id": "TXN00008",
-          "amount": 7346.96,
-          "status": "SUCCESS",
-          "time_ms": 266
-        },
-        {
-          "id": "TXN00009",
-          "amount": 9316.21,
-          "status": "SUCCESS",
-          "time_ms": 280
-        },
-        {
-          "id": "TXN00010",
-          "amount": 7635.67,
-          "status": "SUCCESS",
-          "time_ms": 337
-        },
-        {
-          "id": "TXN00011",
-          "amount": 8410.06,
-          "status": "SUCCESS",
-          "time_ms": 299
-        },
-        {
-          "id": "TXN00012",
-          "amount": 8098.21,
+          "id": "TXN00001024",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
           "time_ms": 319
         },
         {
-          "id": "TXN00013",
-          "amount": 10343.31,
+          "id": "TXN00001025",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 303
+          "time_ms": 424
         },
         {
-          "id": "TXN00014",
-          "amount": 8884.72,
+          "id": "TXN00001026",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 258
+          "time_ms": 180
         },
         {
-          "id": "TXN00015",
-          "amount": 9384.28,
+          "id": "TXN00001027",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 240
+          "time_ms": 384
         },
         {
-          "id": "TXN00016",
-          "amount": 10297.43,
+          "id": "TXN00001028",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 329
+          "time_ms": 473
         },
         {
-          "id": "TXN00017",
-          "amount": 8221.14,
+          "id": "TXN00001029",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 231
+          "time_ms": 230
         },
         {
-          "id": "TXN00018",
-          "amount": 8796.4,
+          "id": "TXN00001030",
+          "amount": 8659.805714285716,
           "status": "SUCCESS",
-          "time_ms": 317
+          "time_ms": 260
         },
         {
-          "id": "TXN00019",
-          "amount": 8483.56,
-          "status": "SUCCESS",
-          "time_ms": 322
-        },
-        {
-          "id": "TXN00020",
-          "amount": 9132.51,
-          "status": "SUCCESS",
-          "time_ms": 277
-        },
-        {
-          "id": "TXN00021",
-          "amount": 8891.71,
-          "status": "SUCCESS",
-          "time_ms": 350
-        },
-        {
-          "id": "TXN00022",
-          "amount": 10301.8,
-          "status": "SUCCESS",
-          "time_ms": 247
-        },
-        {
-          "id": "TXN00023",
-          "amount": 7299.2,
-          "status": "SUCCESS",
-          "time_ms": 332
-        },
-        {
-          "id": "TXN00024",
-          "amount": 9810.39,
-          "status": "SUCCESS",
-          "time_ms": 317
-        },
-        {
-          "id": "TXN00025",
-          "amount": 8333.66,
-          "status": "SUCCESS",
-          "time_ms": 345
-        },
-        {
-          "id": "TXN00026",
-          "amount": 7729.2,
-          "status": "SUCCESS",
-          "time_ms": 236
-        },
-        {
-          "id": "TXN00027",
-          "amount": 9013.58,
-          "status": "SUCCESS",
-          "time_ms": 278
-        },
-        {
-          "id": "TXN00028",
-          "amount": 10155.14,
-          "status": "SUCCESS",
-          "time_ms": 202
-        },
-        {
-          "id": "TXN00029",
-          "amount": 8187.2,
-          "status": "SUCCESS",
-          "time_ms": 224
-        },
-        {
-          "id": "TXN00030",
-          "amount": 9726.27,
-          "status": "SUCCESS",
-          "time_ms": 283
-        },
-        {
-          "id": "TXN00031",
-          "amount": 8536.12,
-          "status": "SUCCESS",
-          "time_ms": 251
-        },
-        {
-          "id": "TXN00032",
-          "amount": 7303.73,
-          "status": "SUCCESS",
-          "time_ms": 228
-        },
-        {
-          "id": "TXN00033",
-          "amount": 10023.3,
+          "id": "TXN00001031",
+          "amount": 8659.805714285716,
           "status": "FAILED",
-          "time_ms": 341
+          "time_ms": 476
         },
         {
-          "id": "TXN00034",
-          "amount": 8602.9,
+          "id": "TXN00001032",
+          "amount": 8659.805714285716,
           "status": "FAILED",
-          "time_ms": 389
-        }
-      ]
-    },
-    {
-      "session_id": 2,
-      "pattern": "ICICI Debit 1000-5000 failing 01:00-20:00",
-      "from_provider": "ICICI",
-      "to_provider": "Axis",
-      "transactions": [
-        {
-          "id": "TXN00000",
-          "amount": 2045.17,
-          "status": "SUCCESS",
-          "time_ms": 250
+          "time_ms": 494
         },
         {
-          "id": "TXN00001",
-          "amount": 2066.52,
-          "status": "SUCCESS",
-          "time_ms": 322
-        },
-        {
-          "id": "TXN00002",
-          "amount": 1519.97,
-          "status": "SUCCESS",
-          "time_ms": 227
-        },
-        {
-          "id": "TXN00003",
-          "amount": 1516.34,
-          "status": "SUCCESS",
-          "time_ms": 286
-        },
-        {
-          "id": "TXN00004",
-          "amount": 2155.38,
-          "status": "SUCCESS",
-          "time_ms": 244
-        },
-        {
-          "id": "TXN00005",
-          "amount": 2090.03,
-          "status": "SUCCESS",
-          "time_ms": 267
-        },
-        {
-          "id": "TXN00006",
-          "amount": 2063.26,
-          "status": "SUCCESS",
-          "time_ms": 301
-        },
-        {
-          "id": "TXN00007",
-          "amount": 1845.78,
-          "status": "SUCCESS",
-          "time_ms": 349
-        },
-        {
-          "id": "TXN00008",
-          "amount": 2014.82,
-          "status": "SUCCESS",
-          "time_ms": 308
-        },
-        {
-          "id": "TXN00009",
-          "amount": 1528.29,
-          "status": "SUCCESS",
-          "time_ms": 300
-        },
-        {
-          "id": "TXN00010",
-          "amount": 1548.32,
-          "status": "SUCCESS",
-          "time_ms": 225
-        },
-        {
-          "id": "TXN00011",
-          "amount": 1919.25,
-          "status": "SUCCESS",
-          "time_ms": 275
-        },
-        {
-          "id": "TXN00012",
-          "amount": 2017.85,
-          "status": "SUCCESS",
-          "time_ms": 298
-        },
-        {
-          "id": "TXN00013",
-          "amount": 1482.42,
-          "status": "SUCCESS",
-          "time_ms": 270
-        },
-        {
-          "id": "TXN00014",
-          "amount": 1958.31,
-          "status": "SUCCESS",
-          "time_ms": 236
-        },
-        {
-          "id": "TXN00015",
-          "amount": 1919.97,
+          "id": "TXN00001033",
+          "amount": 8659.805714285716,
           "status": "FAILED",
-          "time_ms": 389
-        }
-      ]
-    },
-    {
-      "session_id": 3,
-      "pattern": "HDFC Rewards 1000-5000 failing 01:00-13:00",
-      "from_provider": "HDFC",
-      "to_provider": "Razorpay",
-      "transactions": [
-        {
-          "id": "TXN00000",
-          "amount": 1929.69,
-          "status": "SUCCESS",
-          "time_ms": 333
+          "time_ms": 327
         },
         {
-          "id": "TXN00001",
-          "amount": 1995.54,
-          "status": "SUCCESS",
-          "time_ms": 270
-        },
-        {
-          "id": "TXN00002",
-          "amount": 2059.16,
-          "status": "SUCCESS",
-          "time_ms": 253
-        },
-        {
-          "id": "TXN00003",
-          "amount": 1761.83,
-          "status": "SUCCESS",
-          "time_ms": 270
-        },
-        {
-          "id": "TXN00004",
-          "amount": 2385.88,
-          "status": "SUCCESS",
-          "time_ms": 235
-        },
-        {
-          "id": "TXN00005",
-          "amount": 1840.5,
-          "status": "SUCCESS",
-          "time_ms": 301
-        },
-        {
-          "id": "TXN00006",
-          "amount": 2090.74,
-          "status": "SUCCESS",
-          "time_ms": 248
-        },
-        {
-          "id": "TXN00007",
-          "amount": 1697.95,
-          "status": "SUCCESS",
-          "time_ms": 330
-        },
-        {
-          "id": "TXN00008",
-          "amount": 1736.67,
-          "status": "SUCCESS",
-          "time_ms": 246
-        },
-        {
-          "id": "TXN00009",
-          "amount": 1811.82,
-          "status": "SUCCESS",
-          "time_ms": 248
-        },
-        {
-          "id": "TXN00010",
-          "amount": 2282.62,
-          "status": "SUCCESS",
-          "time_ms": 232
-        },
-        {
-          "id": "TXN00011",
-          "amount": 2143.87,
-          "status": "SUCCESS",
-          "time_ms": 205
-        },
-        {
-          "id": "TXN00012",
-          "amount": 1856.5,
+          "id": "TXN00001034",
+          "amount": 8659.805714285716,
           "status": "FAILED",
-          "time_ms": 341
+          "time_ms": 206
         }
       ]
     }

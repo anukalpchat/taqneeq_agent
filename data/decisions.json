@@ -1,43 +1,43 @@
 {
   "metadata": {
-    "timestamp": "2026-02-01T02:27:53.490838",
+    "timestamp": "2026-02-01T07:43:25.065602",
     "model_used": "llama-3.3-70b-versatile",
-    "inference_time_seconds": 4.88,
-    "total_decisions": 10
+    "inference_time_seconds": 4.51,
+    "total_decisions": 9
   },
   "decisions": [
     {
       "pattern_detected": "HDFC Rewards >5000 failing 14:00-16:00",
       "affected_volume": 35,
       "avg_amount": 8659.805714285716,
-      "cost_analysis": "Reroute cost: ₹525 (35×₹15). Revenue saved: ₹2,821.19 (35×₹80.62 avg margin). Net: +₹2,296.19",
+      "cost_analysis": "Reroute cost: ₹525 (35×₹15). Revenue saved: ₹3029.69 (35×₹86.55 avg margin). Net: +₹2504.69",
       "temporal_signal": "stable",
       "decision": "REROUTE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates ₹2,821.19 revenue potential - ₹525 cost = ₹2,296.19 net benefit. CTO perspective: 92.1% failure rate affecting VIP customers for 2 hours violates our 99.5% SLA commitment. Pattern stability indicates systemic HDFC issue, making reroute to Razorpay likely to succeed. Moderator synthesis: Unanimous decision—both financial profitability and operational reliability perspectives strongly align.",
+      "reasoning": "CFO perspective: Excellent ROI with ₹86.55 average margin per transaction. Total net benefit of ₹2504.69 is substantial, not marginal. CTO perspective: 92% failure rate affecting VIP customers for 2 hours violates our 99.5% SLA commitment. Pattern stability indicates systemic HDFC issue, making reroute to Razorpay likely to succeed. Moderator synthesis: Unanimous decision—both financial profitability and operational reliability perspectives strongly align. Zero conflict between profit and customer impact logic.",
       "confidence": 0.95
     },
     {
       "pattern_detected": "ICICI Debit 1000-5000 failing 01:00-20:00",
       "affected_volume": 16,
       "avg_amount": 1840.615625,
-      "cost_analysis": "Reroute cost: ₹240 (16×₹15). Revenue saved: ₹442.56 (16×₹27.66 avg margin). Net: +₹202.56",
+      "cost_analysis": "Reroute cost: ₹240 (16×₹15). Revenue saved: ₹294.24 (16×₹18.39 avg margin). Net: +₹54.24",
       "temporal_signal": "stable",
-      "decision": "REROUTE",
+      "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates ₹442.56 revenue potential - ₹240 cost = ₹202.56 net benefit. CTO perspective: 26.2% failure rate is relatively low but still worth rerouting for customer experience. Moderator synthesis: Both perspectives agree on rerouting for customer satisfaction and moderate profit.",
-      "confidence": 0.8
+      "reasoning": "CFO perspective: Marginal immediate profit of ₹54.24. Below the ₹500 threshold for strong conviction. Notes opportunity cost of deploying ₹240 elsewhere. CTO perspective: Low customer impact with 26% failure rate. Pattern stability indicates transient issue. Moderator decision: Applying Tiebreaker Rule #4 (Low Confidence Degrades to Safer Action). Since the net benefit is marginal and the failure rate is relatively low, it's safer to ignore this pattern and focus on more critical issues.",
+      "confidence": 0.6
     },
     {
       "pattern_detected": "HDFC Rewards 1000-5000 failing 01:00-13:00",
       "affected_volume": 13,
       "avg_amount": 2089.3653846153848,
-      "cost_analysis": "Reroute cost: ₹195 (13×₹15). Revenue saved: ₹271.19 (13×₹20.85 avg margin). Net: +₹76.19",
+      "cost_analysis": "Reroute cost: ₹195 (13×₹15). Revenue saved: ₹179.19 (13×₹13.78 avg margin). Net: -₹15.81",
       "temporal_signal": "stable",
-      "decision": "REROUTE",
+      "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates ₹271.19 revenue potential - ₹195 cost = ₹76.19 net benefit. CTO perspective: 22.4% failure rate is moderate and worth rerouting for customer experience. Moderator synthesis: Both perspectives agree on rerouting for customer satisfaction and moderate profit.",
-      "confidence": 0.75
+      "reasoning": "CFO perspective: Negative ROI with -₹15.81 net loss. CTO perspective: Low customer impact with 22% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the negative net benefit and low customer impact.",
+      "confidence": 0.8
     },
     {
       "pattern_detected": "ICICI Debit 100-1000 failing 18:00-20:00",
@@ -47,7 +47,7 @@
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹378.95 net loss. CTO perspective: 39.2% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
+      "reasoning": "CFO perspective: Severe negative ROI with -₹378.95 net loss. CTO perspective: Low customer impact with 39% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the severe negative net benefit and relatively low customer impact.",
       "confidence": 0.9
     },
     {
@@ -58,8 +58,8 @@
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹121.71 net loss. CTO perspective: 21.9% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
-      "confidence": 0.85
+      "reasoning": "CFO perspective: Negative ROI with -₹121.71 net loss. CTO perspective: Low customer impact with 22% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the negative net benefit and low customer impact.",
+      "confidence": 0.8
     },
     {
       "pattern_detected": "Kotak Debit 100-1000 failing 17:00-20:00",
@@ -69,64 +69,53 @@
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹153.44 net loss. CTO perspective: 19.5% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
+      "reasoning": "CFO perspective: Negative ROI with -₹153.44 net loss. CTO perspective: Low customer impact with 19% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the negative net benefit and low customer impact.",
       "confidence": 0.8
     },
     {
       "pattern_detected": "SBI Corporate 100-1000 failing 18:00-24:00",
       "affected_volume": 14,
       "avg_amount": 545.4907142857143,
-      "cost_analysis": "Reroute cost: ₹210 (14×₹15). Revenue saved: ₹60.69 (14×₹4.34 avg margin). Net: -₹149.31",
+      "cost_analysis": "Reroute cost: ₹210 (14×₹15). Revenue saved: ₹54.45 (14×₹3.89 avg margin). Net: -₹155.55",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹149.31 net loss. CTO perspective: 21.2% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
-      "confidence": 0.85
+      "reasoning": "CFO perspective: Negative ROI with -₹155.55 net loss. CTO perspective: Low customer impact with 21% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the negative net benefit and low customer impact.",
+      "confidence": 0.8
     },
     {
       "pattern_detected": "ICICI Credit 100-1000 failing 05:00-16:00",
       "affected_volume": 12,
       "avg_amount": 572.6008333333333,
-      "cost_analysis": "Reroute cost: ₹180 (12×₹15). Revenue saved: ₹57.44 (12×₹4.78 avg margin). Net: -₹122.56",
+      "cost_analysis": "Reroute cost: ₹180 (12×₹15). Revenue saved: ₹45.96 (12×₹3.83 avg margin). Net: -₹134.04",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹122.56 net loss. CTO perspective: 17.4% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
+      "reasoning": "CFO perspective: Negative ROI with -₹134.04 net loss. CTO perspective: Low customer impact with 17% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the negative net benefit and low customer impact.",
       "confidence": 0.8
     },
     {
       "pattern_detected": "Kotak Rewards 100-1000 failing 11:00-19:00",
       "affected_volume": 11,
       "avg_amount": 584.8890909090909,
-      "cost_analysis": "Reroute cost: ₹165 (11×₹15). Revenue saved: ₹48.19 (11×₹4.38 avg margin). Net: -₹116.81",
+      "cost_analysis": "Reroute cost: ₹165 (11×₹15). Revenue saved: ₹34.39 (11×₹3.12 avg margin). Net: -₹130.61",
       "temporal_signal": "stable",
       "decision": "IGNORE",
       "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹116.81 net loss. CTO perspective: 16.2% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
-      "confidence": 0.75
-    },
-    {
-      "pattern_detected": "SBI Debit 100-1000 failing 05:00-07:00",
-      "affected_volume": 11,
-      "avg_amount": 575.4790909090909,
-      "cost_analysis": "Reroute cost: ₹165 (11×₹15). Revenue saved: ₹47.91 (11×₹4.35 avg margin). Net: -₹117.09",
-      "temporal_signal": "stable",
-      "decision": "IGNORE",
-      "risk_category": "payment_failure",
-      "reasoning": "CFO perspective: Calculates -₹117.09 net loss. CTO perspective: 15.9% failure rate is moderate but the low average transaction amount makes rerouting less viable. Moderator synthesis: Both perspectives agree on ignoring due to low profit margin and moderate failure rate.",
+      "reasoning": "CFO perspective: Negative ROI with -₹130.61 net loss. CTO perspective: Low customer impact with 16% failure rate. Pattern stability indicates transient issue. Moderator synthesis: Unanimous decision—both financial and operational perspectives recommend ignoring this pattern due to the negative net benefit and low customer impact.",
       "confidence": 0.8
     }
   ],
   "metrics": {
     "total_transactions": 2500,
     "total_failures": 459,
-    "reroutes_executed": 3,
-    "reroutes_ignored": 7,
+    "reroutes_executed": 1,
+    "reroutes_ignored": 8,
     "alerts_raised": 0,
-    "total_cost": 1290.0,
-    "total_revenue_saved": 12712.725000000002,
-    "net_profit": 11422.725000000002,
-    "patterns_discovered": 10,
+    "total_cost": 525.0,
+    "total_revenue_saved": 6061.864000000001,
+    "net_profit": 5536.864000000001,
+    "patterns_discovered": 9,
     "decision_accuracy": 0.85
   }
 }
