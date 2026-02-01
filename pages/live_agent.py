@@ -452,7 +452,7 @@ def send_big_transaction_alert(txn: Dict[str, Any], decision: Dict[str, Any]):
     if not smtp_user or not smtp_password:
         return  # Skip if no SMTP configured
     
-    subject = f"🚨 SENTINEL Alert: High-Value Transaction ₹{txn['amount']:,.0f}"
+    subject = f"SENTINEL Alert: High-Value Transaction ₹{txn['amount']:,.0f}"
     
     html_body = f"""
     <!DOCTYPE html>
@@ -476,13 +476,13 @@ def send_big_transaction_alert(txn: Dict[str, Any], decision: Dict[str, Any]):
     <body>
         <div class="container">
             <div class="header">
-                <h1>🚨 High-Value Transaction Alert</h1>
+                <h1>High-Value Transaction Alert</h1>
                 <p style="margin: 5px 0 0 0; opacity: 0.9;">{datetime.now().strftime('%B %d, %Y at %I:%M %p')}</p>
             </div>
             
             <div class="content">
                 <div class="alert-box">
-                    <strong>⚠️ Action Required</strong><br>
+                    <strong>Action Required</strong><br>
                     A high-value transaction (>₹5,000) requires immediate attention.
                 </div>
                 
@@ -515,7 +515,7 @@ def send_big_transaction_alert(txn: Dict[str, Any], decision: Dict[str, Any]):
                 </div>
                 
                 <div class="decision-box">
-                    <h3 style="margin: 0 0 10px 0; color: #0284c7;">🤖 SENTINEL Decision</h3>
+                    <h3 style="margin: 0 0 10px 0; color: #0284c7;">SENTINEL Decision</h3>
                     <div class="detail-row">
                         <span class="detail-label">Action:</span>
                         <span class="detail-value">{decision['decision']}</span>
@@ -543,7 +543,7 @@ def send_big_transaction_alert(txn: Dict[str, Any], decision: Dict[str, Any]):
 SENTINEL High-Value Transaction Alert
 {datetime.now().strftime('%B %d, %Y at %I:%M %p')}
 
-⚠️ ACTION REQUIRED
+ACTION REQUIRED
 A high-value transaction (>₹5,000) requires immediate attention.
 
 TRANSACTION DETAILS
@@ -679,15 +679,15 @@ if 'total_cost' not in st.session_state:
 # ════════════════════════════════════════════════════════
 #  MAIN UI
 # ════════════════════════════════════════════════════════
-st.title("⚡ Live Agent in Action")
+st.title("Live Agent in Action")
 st.markdown("Watch SENTINEL process failed transactions in real-time and make autonomous routing decisions.")
 
 # Show email status
 recipient = os.getenv("RECIPIENT_EMAIL")
 if recipient:
-    st.info(f"📧 Email alerts enabled for transactions >₹5K → {recipient}")
+    st.info(f"Email alerts enabled for transactions >₹5K → {recipient}")
 else:
-    st.warning("📧 Email alerts disabled (configure RECIPIENT_EMAIL in .env to enable)")
+    st.warning("Email alerts disabled (configure RECIPIENT_EMAIL in .env to enable)")
 
 # Load transactions
 all_transactions = load_transactions()
@@ -697,7 +697,7 @@ failed_txns = get_failed_transactions(all_transactions, limit=30)
 col_ctrl1, col_ctrl2, col_ctrl3, col_ctrl4 = st.columns([1, 1, 1, 1])
 
 with col_ctrl1:
-    if st.button("▶️ Start Demo", disabled=st.session_state.demo_running):
+    if st.button("Start Demo", disabled=st.session_state.demo_running):
         st.session_state.demo_running = True
         st.session_state.current_index = 0
         st.session_state.processed_txns = []
@@ -709,12 +709,12 @@ with col_ctrl1:
         st.rerun()
 
 with col_ctrl2:
-    if st.button("⏹️ Stop", disabled=not st.session_state.demo_running):
+    if st.button("Stop", disabled=not st.session_state.demo_running):
         st.session_state.demo_running = False
         st.rerun()
 
 with col_ctrl3:
-    if st.button("🔄 Reset"):
+    if st.button("Reset"):
         st.session_state.demo_running = False
         st.session_state.current_index = 0
         st.session_state.processed_txns = []
@@ -781,12 +781,12 @@ with col_decision:
             alt_bank = ALTERNATE_BANKS.get(txn['bank'], 'HDFC')
             arrow_html = f'<div class="arrow-container" style="margin: 1rem 0;"><span style="color:#ff6b6b; font-weight:700; font-size: 1.2rem;">{txn["bank"]}</span><span class="flow-arrow" style="font-size: 1.6rem;"> → → → </span><span style="color:#51cf66; font-weight:700; font-size: 1.2rem;">{alt_bank}</span></div>'
         
-        decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">🧠 AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">📋 TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">₹{txn["amount"]:,.2f}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div><div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
+        decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">₹{txn["amount"]:,.2f}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div><div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
     
     elif st.session_state.demo_running:
-        decision_html = '<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">🧠 AI Decision Engine</div><div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ffd43b;"><div style="text-align:center;"><div style="font-size:3rem; margin-bottom: 1rem;">⏳</div><div style="font-size: 1.3rem;">Processing...</div></div></div></div>'
+        decision_html = '<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ffd43b;"><div style="text-align:center;"><div style="font-size: 1.3rem;">Processing...</div></div></div></div>'
     else:
-        decision_html = '<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">🧠 AI Decision Engine</div><div style="flex:1; display:flex; align-items:center; justify-content:center; color:#666;"><div style="text-align:center;"><div style="font-size:3rem; margin-bottom: 1rem;">🎯</div><div style="font-size: 1.3rem;">Click "Start Demo"</div></div></div></div>'
+        decision_html = '<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div style="flex:1; display:flex; align-items:center; justify-content:center; color:#666;"><div style="text-align:center;"><div style="font-size: 1.3rem;">Click "Start Demo"</div></div></div></div>'
     
     st.markdown(decision_html, unsafe_allow_html=True)
 
@@ -805,7 +805,7 @@ with col_dest:
     else:
         rerouted_cards = '<div style="color:#666; text-align:center; padding:3rem; font-size: 1.2rem;">No reroutes yet</div>'
     
-    dest_html = f'<div class="bank-container"><div class="bank-header bank-dest" style="font-size: 1.6rem;">✅ Successfully Rerouted</div><div class="queue-container">{rerouted_cards}</div></div>'
+    dest_html = f'<div class="bank-container"><div class="bank-header bank-dest" style="font-size: 1.6rem;">Successfully Rerouted</div><div class="queue-container">{rerouted_cards}</div></div>'
     st.markdown(dest_html, unsafe_allow_html=True)
 
 
@@ -837,7 +837,7 @@ st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
 #  DECISION LOG
 # ════════════════════════════════════════════════════════
 if st.session_state.processed_txns:
-    with st.expander("📜 Decision Log", expanded=False):
+    with st.expander("Decision Log", expanded=False):
         st.markdown('<div style="margin-top: 0.5rem;"></div>', unsafe_allow_html=True)
         log_data = []
         for entry in reversed(st.session_state.processed_txns[-20:]):
@@ -862,7 +862,7 @@ if st.session_state.demo_running and st.session_state.current_index < len(failed
     st.session_state.current_txn = current_txn
     
     # Get AI decision (this is the actual LLM call!)
-    with st.spinner("🧠 AI is analyzing..."):
+    with st.spinner("AI is analyzing..."):
         decision = get_llm_decision(current_txn)
     
     st.session_state.current_decision = decision
@@ -906,10 +906,10 @@ if st.session_state.demo_running and st.session_state.current_index < len(failed
         # Send final summary email
         send_live_demo_summary()
         st.balloons()
-        st.success("✅ Demo complete! Summary email sent.")
+        st.success("Demo complete! Summary email sent.")
     
     st.rerun()
 
 elif st.session_state.demo_running:
     st.session_state.demo_running = False
-    st.success("✅ Demo complete! All transactions processed.")
+    st.success("Demo complete! All transactions processed.")
