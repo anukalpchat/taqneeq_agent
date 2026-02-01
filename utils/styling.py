@@ -69,12 +69,12 @@ def inject_custom_css():
     div[data-testid="metric-container"] {
         background: var(--bg-card);
         border:     1px solid var(--border);
-        border-radius: 10px;
-        padding:    0.8rem 1rem !important;
+        border-radius: 12px;
+        padding:    1.2rem 1.3rem !important;
     }
     div[data-testid="metric-container"] div:first-child {
         color: var(--text-label) !important;
-        font-size: 0.72rem !important;
+        font-size: 0.85rem !important;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         font-family: 'Rajdhani', sans-serif !important;
@@ -83,7 +83,7 @@ def inject_custom_css():
     div[data-testid="metric-container"] div:nth-child(2) {
         font-family: 'Rajdhani', sans-serif !important;
         font-weight: 700 !important;
-        font-size: 1.55rem !important;
+        font-size: 2rem !important;
     }
 
     /* Expander styling */
@@ -241,50 +241,50 @@ def inject_custom_css():
     /* ── SECTION TITLES ── */
     .section-title {
         font-family:    'Rajdhani', sans-serif;
-        font-size:      1.05rem;
+        font-size:      1.35rem;
         font-weight:    600;
         color:          var(--text-primary);
         text-transform: uppercase;
         letter-spacing: 0.1em;
         display:        flex;
         align-items:    center;
-        gap:            0.55rem;
-        margin-bottom:  0.55rem;
-        padding-bottom: 0.35rem;
-        border-bottom:  1px solid var(--border);
+        gap:            0.7rem;
+        margin-bottom:  1rem;
+        padding-bottom: 0.6rem;
+        border-bottom:  2px solid var(--border);
     }
-    .section-title .title-icon { font-size: 1rem; }
+    .section-title .title-icon { font-size: 1.4rem; }
 
     /* ── PATTERN CARDS ── */
     .pattern-card {
         background:    var(--bg-card);
         border:        1px solid var(--border);
-        border-radius: 10px;
-        padding:       0.85rem;
-        margin-bottom: 0.6rem;
+        border-radius: 12px;
+        padding:       1.2rem;
+        margin-bottom: 1rem;
         position:      relative;
         transition:    border-color 0.2s, box-shadow 0.2s;
     }
     .pattern-card:hover {
         border-color: var(--border-hi);
-        box-shadow:   0 2px 12px rgba(0,0,0,0.25);
+        box-shadow:   0 4px 20px rgba(0,0,0,0.3);
     }
-    .pattern-card.card-reroute  { border-left: 3px solid var(--green);  }
-    .pattern-card.card-ignore   { border-left: 3px solid #546e7a;       }
-    .pattern-card.card-alert    { border-left: 3px solid var(--amber);  }
+    .pattern-card.card-reroute  { border-left: 4px solid var(--green);  }
+    .pattern-card.card-ignore   { border-left: 4px solid #546e7a;       }
+    .pattern-card.card-alert    { border-left: 4px solid var(--amber);  }
 
     .pattern-card .card-header {
         display:        flex;
         align-items:    center;
         justify-content: space-between;
-        margin-bottom:  0.45rem;
+        margin-bottom:  0.7rem;
         flex-wrap:      wrap;
-        gap:            0.35rem;
+        gap:            0.5rem;
     }
     .pattern-card .card-header .pattern-name {
         font-family: 'Rajdhani', sans-serif;
-        font-size:   0.88rem;
-        font-weight: 600;
+        font-size:   1.1rem;
+        font-weight: 700;
         color:       var(--text-primary);
     }
 
@@ -292,75 +292,76 @@ def inject_custom_css():
     .badge {
         display:        inline-flex;
         align-items:    center;
-        gap:            0.28rem;
-        padding:        2px 9px;
+        gap:            0.35rem;
+        padding:        4px 12px;
         border-radius:  20px;
         font-family:    'Rajdhani', sans-serif;
-        font-size:      0.7rem;
+        font-size:      0.85rem;
         font-weight:    700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
     }
-    .badge-reroute { background: rgba(76,175,80,0.15); color: var(--green);  border: 1px solid rgba(76,175,80,0.3); }
-    .badge-ignore  { background: rgba(84,110,122,0.15); color: #78909c;     border: 1px solid rgba(84,110,122,0.3); }
-    .badge-alert   { background: rgba(255,183,77,0.13); color: var(--amber); border: 1px solid rgba(255,183,77,0.3); }
+    .badge-reroute { background: rgba(76,175,80,0.2); color: var(--green);  border: 1px solid rgba(76,175,80,0.4); }
+    .badge-ignore  { background: rgba(84,110,122,0.2); color: #78909c;     border: 1px solid rgba(84,110,122,0.4); }
+    .badge-alert   { background: rgba(255,183,77,0.2); color: var(--amber); border: 1px solid rgba(255,183,77,0.4); }
 
     .pattern-card .card-meta {
         display: flex;
-        gap:     1rem;
+        gap:     1.2rem;
         flex-wrap: wrap;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.8rem;
     }
     .pattern-card .meta-item {
-        font-size: 0.72rem;
+        font-size: 0.9rem;
         color:     var(--text-dim);
     }
     .pattern-card .meta-item strong {
         color: var(--text-primary);
         font-weight: 600;
+        font-size: 1rem;
     }
 
     .pattern-card .financials {
         display:        flex;
-        gap:            0.6rem;
+        gap:            1rem;
         flex-wrap:      wrap;
-        margin-bottom:  0.5rem;
-        padding:        0.4rem 0.55rem;
-        background:     rgba(0,0,0,0.2);
-        border-radius:  6px;
+        margin-bottom:  0.8rem;
+        padding:        0.7rem 1rem;
+        background:     rgba(0,0,0,0.3);
+        border-radius:  8px;
     }
     .pattern-card .fin-item {
-        font-size: 0.7rem;
+        font-size: 0.85rem;
         color:     var(--text-dim);
     }
     .pattern-card .fin-item .fin-val {
         font-family: 'Rajdhani', sans-serif;
         font-weight: 700;
-        font-size:   0.82rem;
+        font-size:   1rem;
     }
     .fin-val.pos { color: var(--green); }
     .fin-val.neg { color: var(--red);   }
     .fin-val.neu { color: var(--accent); }
 
     .confidence-bar-track {
-        height:        4px;
-        background:    rgba(255,255,255,0.08);
-        border-radius: 2px;
+        height:        6px;
+        background:    rgba(255,255,255,0.1);
+        border-radius: 3px;
         overflow:      hidden;
-        margin-top:    0.45rem;
+        margin-top:    0.6rem;
     }
     .confidence-bar-fill {
         height:     100%;
-        border-radius: 2px;
+        border-radius: 3px;
         background: linear-gradient(90deg, var(--accent-dim), var(--accent));
         transition: width 0.6s ease;
     }
     .confidence-label {
         display:        flex;
         justify-content:space-between;
-        font-size:      0.62rem;
+        font-size:      0.8rem;
         color:          var(--text-label);
-        margin-top:     0.2rem;
+        margin-top:     0.4rem;
         font-family:    'Inter', sans-serif;
     }
 
@@ -420,18 +421,18 @@ def inject_custom_css():
     .metrics-card {
         background:    var(--bg-card);
         border:        1px solid var(--border);
-        border-radius: 10px;
-        padding:       0.75rem 0.85rem;
-        margin-bottom: 0.55rem;
+        border-radius: 12px;
+        padding:       1rem 1.1rem;
+        margin-bottom: 0.8rem;
     }
     .metrics-card-title {
         font-family:    'Rajdhani', sans-serif;
-        font-size:      0.72rem;
+        font-size:      0.9rem;
         font-weight:    600;
         color:          var(--text-label);
         text-transform: uppercase;
         letter-spacing: 0.1em;
-        margin-bottom:  0.4rem;
+        margin-bottom:  0.6rem;
     }
 
     /* ── SYSTEM STATUS WIDGET ── */
@@ -439,13 +440,13 @@ def inject_custom_css():
         display:        flex;
         align-items:    center;
         justify-content: space-between;
-        padding:        0.28rem 0;
+        padding:        0.4rem 0;
         border-bottom:  1px solid rgba(30,73,118,0.35);
-        font-size:      0.72rem;
+        font-size:      0.85rem;
     }
     .sys-status-row:last-child { border-bottom: none; }
     .sys-status-row .sys-label { color: var(--text-dim); }
-    .sys-status-row .sys-val   { color: var(--text-primary); font-weight: 500; font-family: 'Rajdhani', sans-serif; }
+    .sys-status-row .sys-val   { color: var(--text-primary); font-weight: 600; font-family: 'Rajdhani', sans-serif; font-size: 0.95rem; }
     .sys-status-row .sys-ok    { color: var(--green); }
     .sys-status-row .sys-warn  { color: var(--amber); }
 

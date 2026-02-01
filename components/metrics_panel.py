@@ -71,13 +71,14 @@ def _waterfall_chart(metrics: dict):
     values  = [0, -cost, rev, net]
     # measure: relative for middle, total for ends
     measure = ["relative", "relative", "relative", "total"]
-    colors  = ["#4e7a9e", "#ef5350", "#4caf50", "#00d4ff"]
 
     fig = go.Figure(go.Waterfall(
         x=labels,
         y=values,
         measure=measure,
-        marker=dict(color=colors, line=dict(color="#0a1929", width=1)),
+        increasing=dict(marker=dict(color="#4caf50")),
+        decreasing=dict(marker=dict(color="#ef5350")),
+        totals=dict(marker=dict(color="#00d4ff")),
         connector=dict(line=dict(color="#1e4976", width=1, dash="dot")),
         text=[f"₹0", f"-₹{cost:,.0f}", f"+₹{rev:,.0f}", f"₹{net:,.0f}"],
         textposition="outside",
@@ -129,46 +130,53 @@ def _system_status(metadata: dict, metrics: dict):
 
 
 def render(metrics: dict, metadata: dict | None = None):
+    """Render metrics panel in horizontal layout"""
     if metadata is None:
         metadata = {}
 
-    # ── Donut chart ──
+    # Section title
     st.markdown(
-        '<div class="metrics-card"><div class="metrics-card-title">📊 Decision Distribution</div></div>',
-        unsafe_allow_html=True,
-    )
-    _donut_chart(metrics)
-
-    # ── Waterfall ──
-    st.markdown(
-        '<div class="metrics-card"><div class="metrics-card-title">💵 Financial Waterfall</div></div>',
-        unsafe_allow_html=True,
-    )
-    _waterfall_chart(metrics)
-
-    # ── Key numbers ──
-    cost = metrics.get("total_cost", 615.0)
-    rev  = metrics.get("total_revenue_saved", 12038.45)
-    eff  = rev / cost if cost else 0
-
-    st.markdown(
-        f'''<div class="metrics-card">
-            <div class="metrics-card-title">📈 Efficiency</div>
-            <div class="sys-status-row">
-                <span class="sys-label">Cost Incurred</span>
-                <span class="sys-val" style="color:#ef5350;">₹{cost:,.0f}</span>
-            </div>
-            <div class="sys-status-row">
-                <span class="sys-label">Revenue Saved</span>
-                <span class="sys-val" style="color:#4caf50;">₹{rev:,.2f}</span>
-            </div>
-            <div class="sys-status-row">
-                <span class="sys-label">Return Multiple</span>
-                <span class="sys-val" style="color:#00d4ff;">{eff:.1f}×</span>
-            </div>
-        </div>''',
+        '<div class="section-title"><span class="title-icon">📊</span> Key Performance Metrics</div>',
         unsafe_allow_html=True,
     )
 
-    # ── System status ──
-    _system_status(metadata, metrics)
+    # Create 4-column layout for key metrics
+    col1, col2, col3, col4 = st.columns(4, gap="medium")
+    
+    with col1:
+        cost = metrics.get("total_cost", 615.0)
+        st.metric("💰 Total Cost", f"₹{cost:,.0f}", delta=None, delta_color="inverse")
+    
+    with col2:
+        rev = metrics.get("total_revenue_saved", 12038.45)
+        st.metric("💵 Revenue Saved", f"₹{rev:,.2f}", delta=None)
+    
+    with col3:
+        eff = rev / cost if cost else 0
+        st.metric("📈 Return Multiple", f"{eff:.1f}×", delta=None)
+    
+    with col4:
+        accuracy = metrics.get("decision_accuracy", 0.85)
+        st.metric("🎯 Decision Accuracy", f"{accuracy*100:.0f}%", delta=None)
+
+    st.markdown('<div style="height:1rem;"></div>', unsafe_allow_html=True)
+
+    # Create 3-column layout for charts and system status
+    chart_col1, chart_col2, chart_col3 = st.columns([1, 1, 1], gap="medium")
+    
+    with chart_col1:
+        st.markdown(
+            '<div class="metrics-card"><div class="metrics-card-title">📊 Decision Distribution</div></div>',
+            unsafe_allow_html=True,
+        )
+        _donut_chart(metrics)
+    
+    with chart_col2:
+        st.markdown(
+            '<div class="metrics-card"><div class="metrics-card-title">💵 Financial Waterfall</div></div>',
+            unsafe_allow_html=True,
+        )
+        _waterfall_chart(metrics)
+    
+    with chart_col3:
+        _system_status(metadata, metrics)

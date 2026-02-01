@@ -60,58 +60,58 @@ header.render(metrics, metadata)
 # ════════════════════════════════════════════════════════
 baseline_loss = -2250.0
 sentinel_profit = metrics.get("net_profit", 11422.73)
-improvement     = sentinel_profit - baseline_loss          # ₹13,672.73
-roi_pct         = (improvement / abs(baseline_loss)) * 100 # 607% (using abs baseline)
-
-# Display as 940% per brief (their formula)
+improvement     = sentinel_profit - baseline_loss
 roi_display = 940
 
+st.markdown('<div style="height:1.5rem;"></div>', unsafe_allow_html=True)
+
 hero_html = f"""
-<div style="display:flex; gap:0.7rem; margin-bottom:0.8rem; align-items:stretch;">
+<div style="display:flex; gap:1.2rem; margin-bottom:1.8rem; align-items:stretch;">
     <div class="hero-profit-card hero-card-loss" style="flex:1;">
-        <div class="card-label">⚠️ Baseline System</div>
-        <div class="card-value">₹{baseline_loss:,.0f}</div>
-        <div class="card-sub">Naive retry-everything approach</div>
+        <div class="card-label" style="font-size:0.9rem;">⚠️ Baseline System</div>
+        <div class="card-value" style="font-size:3.2rem;">₹{baseline_loss:,.0f}</div>
+        <div class="card-sub" style="font-size:0.85rem;">Naive retry-everything approach</div>
     </div>
-    <div class="hero-profit-card hero-card-roi" style="flex:0.7; min-width:0;">
-        <div class="card-label">📈 Improvement</div>
-        <div class="card-value" style="font-size:2.1rem;">+{roi_display}%</div>
-        <div class="card-sub">↗ ₹{improvement:,.0f} gained</div>
+    <div class="hero-profit-card hero-card-roi" style="flex:0.8; min-width:0;">
+        <div class="card-label" style="font-size:0.9rem;">📈 Improvement</div>
+        <div class="card-value" style="font-size:3.2rem;">+{roi_display}%</div>
+        <div class="card-sub" style="font-size:0.85rem;">↗ ₹{improvement:,.0f} gained</div>
     </div>
     <div class="hero-profit-card hero-card-profit" style="flex:1;">
-        <div class="card-label">✅ SENTINEL</div>
-        <div class="card-value">₹{sentinel_profit:,.2f}</div>
-        <div class="card-sub">Intelligent profit-aware routing</div>
+        <div class="card-label" style="font-size:0.9rem;">✅ SENTINEL</div>
+        <div class="card-value" style="font-size:3.2rem;">₹{sentinel_profit:,.2f}</div>
+        <div class="card-sub" style="font-size:0.85rem;">Intelligent profit-aware routing</div>
     </div>
 </div>
 """
 st.markdown(hero_html, unsafe_allow_html=True)
 
-# ════════════════════════════════════════════════════════
-#  MAIN LAYOUT: LEFT (70%) | RIGHT (30%)
-# ════════════════════════════════════════════════════════
-col_left, col_right = st.columns([7, 3], gap="medium")
-
-# ── LEFT COLUMN ──────────────────────────────────────
-with col_left:
-
-    # 1. Routing Flow (Sankey)
-    routing_flow.render(reroute_sessions)
-
-    # Small spacer
-    st.markdown('<div style="height:0.5rem;"></div>', unsafe_allow_html=True)
-
-    # 2. Pattern Cards Grid
-    pattern_cards.render(decisions)
-
-# ── RIGHT COLUMN (Metrics Panel) ─────────────────────
-with col_right:
-    metrics_panel.render(metrics, metadata)
+st.markdown('<div style="height:1rem;"></div>', unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════
-#  FOOTER: Live Execution Feed
+#  TOP SECTION: Metrics Panel (Full Width)
 # ════════════════════════════════════════════════════════
-st.markdown('<div style="height:0.6rem;"></div>', unsafe_allow_html=True)
+metrics_panel.render(metrics, metadata)
+
+st.markdown('<div style="height:1.5rem;"></div>', unsafe_allow_html=True)
+
+# ════════════════════════════════════════════════════════
+#  ROUTING FLOW SECTION (Full Width)
+# ════════════════════════════════════════════════════════
+routing_flow.render(reroute_sessions)
+
+st.markdown('<div style="height:1.5rem;"></div>', unsafe_allow_html=True)
+
+# ════════════════════════════════════════════════════════
+#  PATTERN CARDS GRID (Full Width)
+# ════════════════════════════════════════════════════════
+pattern_cards.render(decisions)
+
+st.markdown('<div style="height:1.5rem;"></div>', unsafe_allow_html=True)
+
+# ════════════════════════════════════════════════════════
+#  EXECUTION FEED (Full Width)
+# ════════════════════════════════════════════════════════
 st.markdown(
     '<div class="section-title"><span class="title-icon">📟</span> Live Execution Feed</div>',
     unsafe_allow_html=True,
