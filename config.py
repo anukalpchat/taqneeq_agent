@@ -42,6 +42,11 @@ BASE_SUCCESS_RATE = 0.92                # 92% baseline success rate
 START_TIME = datetime(2026, 1, 31, 0, 0, 0)
 DURATION_HOURS = 24
 
+# International Transaction Settings
+INTERNATIONAL_RATE = 0.15               # 15% of transactions are international
+INTERNATIONAL_CURRENCIES = ["USD", "EUR", "GBP", "AED", "SGD", "AUD"]
+INTERNATIONAL_CURRENCY_WEIGHTS = [0.35, 0.25, 0.15, 0.10, 0.10, 0.05]  # USD most common
+
 # Transaction Dimensions
 BANKS = ["HDFC", "SBI", "ICICI", "Axis", "Kotak"]
 CARD_TYPES = ["Debit", "Credit", "Rewards", "Corporate"]

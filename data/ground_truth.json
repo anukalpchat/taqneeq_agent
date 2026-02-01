@@ -1,5 +1,5 @@
 {
-  "generation_timestamp": "2026-01-31T22:28:37.512140",
+  "generation_timestamp": "2026-02-01T10:56:04.818085",
   "configuration": {
     "total_transactions": 2500,
     "base_success_rate": 0.92,
@@ -16,34 +16,34 @@
     },
     "margin_destroyer": {
       "description": "SBI micro-transactions <\u20b9100 with high failure rate",
-      "matched_transactions": 89,
-      "failed_transactions": 65,
-      "failure_rate": 0.7303370786516854,
+      "matched_transactions": 147,
+      "failed_transactions": 114,
+      "failure_rate": 0.7755102040816326,
       "expected_action": "IGNORE",
       "profitability": "NEGATIVE"
     },
     "canary_spike": {
       "description": "ICICI Debit escalating failure pattern",
-      "matched_transactions": 65,
-      "failed_transactions": 47,
-      "failure_rate": 0.7230769230769231,
+      "matched_transactions": 64,
+      "failed_transactions": 46,
+      "failure_rate": 0.71875,
       "expected_action": "ALERT",
       "profitability": "N/A"
     },
     "weekend_vip": {
       "description": "VIP Travel transactions failing on weekends",
-      "matched_transactions": 188,
-      "failed_transactions": 124,
-      "failure_rate": 0.6595744680851063,
+      "matched_transactions": 196,
+      "failed_transactions": 117,
+      "failure_rate": 0.5969387755102041,
       "expected_action": "REROUTE",
       "profitability": "MEDIUM"
     }
   },
   "overall_statistics": {
     "total_transactions": 2500,
-    "successes": 2041,
-    "failures": 459,
-    "success_rate": 0.8164
+    "successes": 2008,
+    "failures": 492,
+    "success_rate": 0.8032
   },
   "expected_outcomes": {
     "whale_trap": {

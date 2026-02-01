@@ -1,10 +1,1 @@
-[
-  {
-    "pattern": "ICICI Debit 1000-5000 failing 01:00-20:00",
-    "original_decision": "IGNORE",
-    "confidence": 0.6,
-    "reason": "Confidence 0.60 below threshold 0.70",
-    "affected": 16,
-    "cost_avoided": 240.0
-  }
-]
+[]

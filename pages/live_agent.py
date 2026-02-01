@@ -9,10 +9,16 @@ from datetime import datetime
 from typing import Optional, Dict, Any
 from dotenv import load_dotenv
 from groq import Groq
+<<<<<<< Updated upstream
 from email_utils import send_daily_summary
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+=======
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from forex_utils import convert_to_inr, get_currency_symbol, format_conversion
+>>>>>>> Stashed changes
 
 # Load environment variables
 load_dotenv()
@@ -88,11 +94,13 @@ st.markdown("""
         border-radius: 16px;
         padding: 1.8rem;
         border: 1px solid rgba(255,255,255,0.15);
-        height: 550px;
+        height: 750px;
+        max-height: 750px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-bottom: 0;
     }
     
     .bank-header {
@@ -160,10 +168,13 @@ st.markdown("""
         border-radius: 16px;
         padding: 1.8rem;
         border: 1px solid rgba(255,255,255,0.15);
-        height: 550px;
+        height: 750px;
+        max-height: 750px;
         display: flex;
         flex-direction: column;
+        overflow: hidden;
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        margin-bottom: 0;
     }
     
     .decision-content {
@@ -172,6 +183,7 @@ st.markdown("""
         flex-direction: column;
         justify-content: space-between;
         overflow-y: auto;
+        min-height: 500px;
     }
     
     .decision-badge-section {
@@ -195,9 +207,10 @@ st.markdown("""
     .thinking-box {
         background: rgba(50, 50, 80, 0.8);
         border-radius: 10px;
-        padding: 1rem;
-        margin: 0.5rem 0;
+        padding: 1.2rem;
+        margin: 0.6rem 0;
         border: 1px solid rgba(255, 212, 59, 0.3);
+        min-height: fit-content;
     }
     
     .thinking-label {
@@ -212,8 +225,10 @@ st.markdown("""
     .thinking-text {
         color: #ddd;
         font-size: 0.95rem;
-        line-height: 1.5;
+        line-height: 1.6;
         font-weight: 400;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
     
     .decision-badge {
@@ -237,7 +252,7 @@ st.markdown("""
         background: rgba(30, 30, 50, 0.95);
         border-radius: 16px;
         padding: 1.2rem 2.5rem;
-        margin: 2rem auto;
+        margin: 0 auto 1rem auto;
         display: flex;
         justify-content: space-around;
         align-items: center;
@@ -246,6 +261,7 @@ st.markdown("""
         position: relative;
         z-index: 100;
         max-width: 1200px;
+        clear: both;
     }
     
     .stat-item {
@@ -347,11 +363,27 @@ def get_llm_decision(txn: Dict[str, Any]) -> Dict[str, Any]:
         # Fallback to rule-based if no API key
         return get_rule_based_decision(txn)
     
-    prompt = f"""You are SENTINEL, an AI payment routing agent. Analyze this FAILED transaction and decide the best action.
+    # Handle international transactions - convert to INR first
+    is_international = txn.get('is_international', False)
+    original_currency = txn.get('currency', 'INR')
+    original_amount = txn['amount']
+    
+    if is_international and original_currency != 'INR':
+        # Convert to INR for decision making
+        amount_inr = convert_to_inr(original_amount, original_currency)
+        forex_info = f"\n\n🌍 INTERNATIONAL TRANSACTION DETECTED\n- Original: {get_currency_symbol(original_currency)}{original_amount:,.2f} {original_currency}\n- Converted: ₹{amount_inr:,.2f} INR (via real-time forex API)\n- Forex Risk Premium: +₹1.50 added to reroute cost\n- Total Reroute Cost: ₹16.50 (vs ₹15 for domestic)\n\nIMPORTANT: Use converted INR amount (₹{amount_inr:,.2f}) for all profitability calculations."
+        effective_amount = amount_inr
+        reroute_cost_override = 16.50
+    else:
+        forex_info = ""
+        effective_amount = original_amount
+        reroute_cost_override = 15.00
+    
+    prompt = f"""You are SENTINEL, an AI payment routing agent. Analyze this FAILED transaction and decide the best action.{forex_info}
 
 TRANSACTION:
 - ID: {txn['transaction_id']}
-- Amount: ₹{txn['amount']:.2f}
+- Amount: ₹{effective_amount:.2f} {'(converted from ' + original_currency + ')' if is_international else ''}
 - Bank: {txn['bank']}
 - Card Type: {txn['card_type']}
 - Error: {txn['error_code']}
@@ -359,14 +391,15 @@ TRANSACTION:
 - Category: {txn['merchant_category']}
 
 BUSINESS RULES:
-- Reroute cost: ₹15 per transaction
+- Reroute cost: ₹{reroute_cost_override} per transaction {'(includes forex risk premium)' if is_international else ''}
 - Margin rate: 2% of transaction amount
-- Only REROUTE if: (amount × 2%) > ₹15 (i.e., amount > ₹750)
-- IGNORE low-value transactions (saves ₹15 reroute cost)
+- Only REROUTE if: (amount × 2%) > ₹{reroute_cost_override} (i.e., amount > ₹{reroute_cost_override * 50})
+- IGNORE low-value transactions (saves ₹{reroute_cost_override} reroute cost)
 - ALERT for infrastructure errors (TIMEOUT, SERVICE_UNAVAILABLE)
+{"- CAUTION: International transaction requires forex API integration and currency conversion verification" if is_international else ""}
 
 Respond in JSON format ONLY:
-{{"decision": "REROUTE" or "IGNORE" or "ALERT", "reasoning": "brief 1-2 sentence explanation", "confidence": 0.0-1.0}}"""
+{{"decision": "REROUTE" or "IGNORE" or "ALERT", "reasoning": "brief 1-2 sentence explanation{' (mention forex risk if international)' if is_international else ''}", "confidence": 0.0-1.0}}"""
 
     try:
         response = client.chat.completions.create(
@@ -385,6 +418,16 @@ Respond in JSON format ONLY:
             result_text = result_text.split("```")[1].split("```")[0]
         
         result = json.loads(result_text)
+        
+        # Add forex info to result if international
+        if is_international:
+            result['forex_conversion'] = {
+                'original_amount': original_amount,
+                'original_currency': original_currency,
+                'converted_amount_inr': effective_amount,
+                'conversion_display': format_conversion(original_amount, original_currency, effective_amount)
+            }
+        
         return result
         
     except Exception as e:
@@ -747,7 +790,12 @@ with col_source:
     if queue_txns:
         for i, txn in enumerate(queue_txns):
             status_class = "processing" if i == 0 and st.session_state.demo_running else "failed"
-            queue_cards += f'<div class="txn-card {status_class}"><div class="txn-id" style="font-size: 1.1rem; margin-bottom: 0.5rem;">{txn["transaction_id"]}</div><div style="margin-bottom: 0.4rem;"><span class="txn-amount" style="font-size: 1.3rem;">₹{txn["amount"]:,.2f}</span> · <span class="txn-bank" style="font-size: 1.1rem;">{txn["bank"]}</span></div><div style="color:#ff6b6b; font-size:0.95rem; font-weight: 500;">{txn.get("error_code", "ERROR")}</div></div>'
+            is_intl = txn.get('is_international', False)
+            currency = txn.get('currency', 'INR')
+            intl_badge = '<span style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">🌍 INTL</span>' if is_intl else ''
+            amount_display = f'{get_currency_symbol(currency)}{txn["amount"]:,.2f}' if is_intl else f'₹{txn["amount"]:,.2f}'
+            
+            queue_cards += f'<div class="txn-card {status_class}"><div class="txn-id" style="font-size: 1.1rem; margin-bottom: 0.5rem;">{txn["transaction_id"]}{intl_badge}</div><div style="margin-bottom: 0.4rem;"><span class="txn-amount" style="font-size: 1.3rem;">{amount_display}</span> · <span class="txn-bank" style="font-size: 1.1rem;">{txn["bank"]}</span></div><div style="color:#ff6b6b; font-size:0.95rem; font-weight: 500;">{txn.get("error_code", "ERROR")}</div></div>'
     else:
         queue_cards = '<div style="color:#666; text-align:center; padding:3rem; font-size: 1.2rem;">Queue empty</div>'
     
@@ -775,13 +823,29 @@ with col_decision:
         reasoning_text = decision.get('reasoning', 'Processing...')
         error_code = txn.get('error_code', 'N/A')
         
+        # Check for forex conversion info
+        is_intl = txn.get('is_international', False)
+        currency = txn.get('currency', 'INR')
+        forex_html = ""
+        
+        if is_intl and decision.get('forex_conversion'):
+            forex_info = decision['forex_conversion']
+            forex_html = f'<div class="thinking-box" style="background: rgba(102, 126, 234, 0.15); border-color: rgba(102, 126, 234, 0.4); margin-bottom: 1rem;"><div class="thinking-label" style="color: #a0aec0; font-size: 0.9rem;">🌍 FOREX CONVERSION</div><div class="thinking-text" style="font-size: 0.95rem;">{forex_info["conversion_display"]}<br><span style="color: #a0aec0; font-size: 0.85rem;">Real-time API conversion applied</span></div></div>'
+        
+        # Amount display
+        amount_display = f'{get_currency_symbol(currency)}{txn["amount"]:,.2f} ({currency})' if is_intl else f'₹{txn["amount"]:,.2f}'
+        
         # Arrow section for REROUTE
         arrow_html = ""
         if decision_type == 'REROUTE':
             alt_bank = ALTERNATE_BANKS.get(txn['bank'], 'HDFC')
             arrow_html = f'<div class="arrow-container" style="margin: 1rem 0;"><span style="color:#ff6b6b; font-weight:700; font-size: 1.2rem;">{txn["bank"]}</span><span class="flow-arrow" style="font-size: 1.6rem;"> → → → </span><span style="color:#51cf66; font-weight:700; font-size: 1.2rem;">{alt_bank}</span></div>'
         
+<<<<<<< Updated upstream
         decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">₹{txn["amount"]:,.2f}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div><div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
+=======
+        decision_html = f'<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">🧠 AI Decision Engine</div><div class="thinking-box" style="margin-bottom: 1rem;"><div class="thinking-label" style="font-size: 0.9rem;">📋 TRANSACTION</div><div class="thinking-text" style="font-size: 1.1rem;"><strong style="font-size: 1.2rem;">{txn["transaction_id"]}</strong><br>Amount: <strong style="color: #fff; font-size: 1.2rem;">{amount_display}</strong><br>Bank: <strong style="color: #74c0fc;">{txn["bank"]}</strong> · Error: <strong style="color: #ff6b6b;">{error_code}</strong></div></div>{forex_html}<div class="thinking-box"><div class="thinking-label" style="font-size: 0.9rem;">💭 AI REASONING</div><div class="thinking-text" style="font-size: 1.05rem; line-height: 1.6;">{reasoning_text}</div></div>{arrow_html}<div style="text-align:center; margin-top:1rem;"><div class="decision-badge {badge_class}" style="font-size: 1.3rem; padding: 0.8rem 2rem;">{decision_type}</div><div style="color:#aaa; font-size:0.9rem; margin-top:0.5rem; font-weight: 500;">Confidence: {confidence:.0f}%</div></div></div>'
+>>>>>>> Stashed changes
     
     elif st.session_state.demo_running:
         decision_html = '<div class="decision-panel"><div class="decision-header" style="font-size: 1.6rem;">AI Decision Engine</div><div style="flex:1; display:flex; align-items:center; justify-content:center; color:#ffd43b;"><div style="text-align:center;"><div style="font-size: 1.3rem;">Processing...</div></div></div></div>'
@@ -808,6 +872,8 @@ with col_dest:
     dest_html = f'<div class="bank-container"><div class="bank-header bank-dest" style="font-size: 1.6rem;">Successfully Rerouted</div><div class="queue-container">{rerouted_cards}</div></div>'
     st.markdown(dest_html, unsafe_allow_html=True)
 
+# Add spacing between layout and stats bar
+st.markdown("<div style='height: 4rem;'></div>", unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════
 #  STATS BAR

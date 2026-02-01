@@ -164,6 +164,32 @@ def generate_base_transaction(index, forced_attributes=None):
     """Generate a single base transaction with random or forced attributes"""
     timestamp = generate_timestamp(index, config.TOTAL_TRANSACTIONS)
     
+    # Determine if international transaction
+    is_international = random.random() < config.INTERNATIONAL_RATE
+    currency = "INR"
+    original_amount = generate_amount()
+    
+    if is_international:
+        # Select currency based on weights
+        currency = random.choices(
+            config.INTERNATIONAL_CURRENCIES,
+            weights=config.INTERNATIONAL_CURRENCY_WEIGHTS,
+            k=1
+        )[0]
+        # Convert amount to foreign currency (rough approximation)
+        if currency == "USD":
+            original_amount = round(original_amount * 0.012, 2)
+        elif currency == "EUR":
+            original_amount = round(original_amount * 0.011, 2)
+        elif currency == "GBP":
+            original_amount = round(original_amount * 0.0095, 2)
+        elif currency == "AED":
+            original_amount = round(original_amount * 0.044, 2)
+        elif currency == "SGD":
+            original_amount = round(original_amount * 0.016, 2)
+        elif currency == "AUD":
+            original_amount = round(original_amount * 0.019, 2)
+    
     txn = {
         "transaction_id": generate_transaction_id(index),
         "timestamp": timestamp,
@@ -171,7 +197,9 @@ def generate_base_transaction(index, forced_attributes=None):
         "card_type": random.choice(config.CARD_TYPES),
         "merchant_category": random.choice(config.MERCHANT_CATEGORIES),
         "customer_tier": random.choice(config.CUSTOMER_TIERS),
-        "amount": generate_amount(),
+        "amount": original_amount,
+        "currency": currency,
+        "is_international": is_international,
         "status": "SUCCESS",  # Default, will be overridden if fails
         "latency_ms": generate_latency(),
         "error_code": None

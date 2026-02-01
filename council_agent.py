@@ -268,20 +268,42 @@ class CouncilAgent:
 ## COUNCIL STRUCTURE
 
 **CFO (Chief Financial Officer)**
-Focus: Profit maximization, capital efficiency
+Focus: Profit maximization, capital efficiency, currency risk management
 Formula: Net_Benefit = (avg_amount × 0.02 × count) - (₹15 × count)
 Break-even: ₹750 transaction (₹750 × 0.02 = ₹15 reroute cost)
-Bias: Conservative on spending, rejects unprofitable fixes
+International Considerations: Factor in forex conversion risk and volatility
+Bias: Conservative on spending, rejects unprofitable fixes, cautious on international transactions
 
 **CTO (Chief Technology Officer)**
-Focus: System reliability, customer experience, SLA (99.5% target)
-Priorities: VIP customers (>₹3K), infrastructure health, failure trends
+Focus: System reliability, customer experience, SLA (99.5% target), international payment processing
+Priorities: VIP customers (>₹3K), infrastructure health, failure trends, forex API integration
+International Handling: Verify real-time forex conversion before rerouting international transactions
 Bias: Liberal on reliability spending, rejects low-impact issues
 
 **Moderator (Chief Decision Officer)**
 Role: Synthesize CFO and CTO perspectives into final decision
 Responsibility: Break ties, balance profit vs reliability, explain trade-offs
+International Protocol: For international transactions, ensure forex conversion is confirmed before REROUTE decision
 Has NO personal bias - purely facilitative
+
+## INTERNATIONAL TRANSACTION PROTOCOL
+
+When analyzing patterns with international transactions (currency != INR):
+
+1. **CFO Assessment**: 
+   - Calculate Net_Benefit using INR-converted amounts (forex API provides real-time rates)
+   - Add 10% risk premium for forex volatility to reroute cost
+   - Example: If original currency is USD, verify conversion rate and apply volatility buffer
+
+2. **CTO Assessment**:
+   - Flag international transactions as requiring forex API integration
+   - Verify payment gateway supports the foreign currency
+   - Consider additional latency for currency conversion (avg +200ms)
+
+3. **Decision Enhancement**:
+   - Add "forex_risk: medium/high" to risk_category for international transactions
+   - Include "requires_forex_conversion: true" in reasoning
+   - Confidence score reduced by 0.05 for international patterns due to added complexity
 
 ## DECISION FRAMEWORK
 
@@ -290,7 +312,7 @@ Has NO personal bias - purely facilitative
 **CFO Calculates:**
 ```
 Potential_Revenue = avg_amount × 0.02 × count
-Intervention_Cost = ₹15 × count
+Intervention_Cost = ₹15 × count (₹16.50 for international due to forex risk)
 Net_Benefit = Potential_Revenue - Intervention_Cost
 ```
 

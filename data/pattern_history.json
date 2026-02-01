@@ -24,5 +24,18 @@
     "second_to_last_outcome": null,
     "current_confidence_modifier": 1.0,
     "confidence_adjustment_log": []
+  },
+  "micro_transaction": {
+    "pattern_type": "micro_transaction",
+    "total_occurrences": 0,
+    "predictions_correct": 0,
+    "predictions_wrong": 0,
+    "prediction_accuracy": null,
+    "average_resolution_time_minutes": null,
+    "last_seen_timestamp": null,
+    "last_outcome": null,
+    "second_to_last_outcome": null,
+    "current_confidence_modifier": 1.0,
+    "confidence_adjustment_log": []
   }
 }

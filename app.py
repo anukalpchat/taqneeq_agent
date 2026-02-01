@@ -73,12 +73,11 @@ if 'selected_page' not in st.session_state:
     st.markdown('<h1 class="main-title">🎯 SENTINEL AI Agent</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">Advanced Financial Transaction Monitoring & Analysis Platform</p>', unsafe_allow_html=True)
 
-# Define pages with enhanced descriptions
+# Define pages
 historical_page = st.Page(
     "pages/historical_analysis.py", 
     title="📊 Historical Analysis", 
-    icon="📊",
-    default=True
+    icon="📊"
 )
 
 live_demo_page = st.Page(
@@ -87,14 +86,8 @@ live_demo_page = st.Page(
     icon="⚡"
 )
 
-# Navigation with better organization
-pg = st.navigation({
-    "Analytics": [historical_page],
-    "Live Demo": [live_demo_page]
-})
-
-# Track page selection
-st.session_state['selected_page'] = True
+# Navigation - simple list for 2 tabs
+pg = st.navigation([historical_page, live_demo_page])
 
 # Run the selected page
 pg.run()
