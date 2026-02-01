@@ -8,7 +8,7 @@ import streamlit as st
 st.set_page_config(
     layout="wide",
     page_title="SENTINEL AI Agent",
-    page_icon="🎯",
+    page_icon="⚫",
     initial_sidebar_state="expanded",
     menu_items={
         'About': """
@@ -70,19 +70,19 @@ st.markdown("""
 
 # Welcome header (only show on main page)
 if 'selected_page' not in st.session_state:
-    st.markdown('<h1 class="main-title">🎯 SENTINEL AI Agent</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-title"><strong>SENTINEL AI Agent</strong></h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">Advanced Financial Transaction Monitoring & Analysis Platform</p>', unsafe_allow_html=True)
 
 # Define pages
 historical_page = st.Page(
     "pages/historical_analysis.py", 
-    title="📊 Historical Analysis", 
+    title="Historical Analysis", 
     icon="📊"
 )
 
 live_demo_page = st.Page(
     "pages/live_agent.py", 
-    title="⚡ Live Agent Demo", 
+    title="Live Agent Demo", 
     icon="⚡"
 )
 

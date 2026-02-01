@@ -796,7 +796,7 @@ with col_source:
     else:
         queue_cards = '<div style="color:#666; text-align:center; padding:3rem; font-size: 1.2rem;">Queue empty</div>'
     
-    source_html = f'<div class="bank-container"><div class="bank-header bank-source" style="font-size: 1.6rem;">📥 Incoming Failed Transactions</div><div class="queue-container">{queue_cards}</div></div>'
+    source_html = f'<div class="bank-container"><div class="bank-header bank-source" style="font-size: 1.6rem;">Incoming Failed Transactions</div><div class="queue-container">{queue_cards}</div></div>'
     st.markdown(source_html, unsafe_allow_html=True)
 
 
