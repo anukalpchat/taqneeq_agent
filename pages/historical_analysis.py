@@ -6,12 +6,12 @@ import plotly.graph_objects as go
 # --- 1. CSS HACKS FOR "SENTINEL" LOOK ---
 st.markdown("""
 <style>
-    /* Force dark background for the whole app */
+    /* Dark theme base */
     .stApp {
         background-color: #0e1117;
     }
     
-    /* Style the metrics to look like cards with light text */
+    /* Consistent metric card styling */
     [data-testid="stMetric"] {
         background-color: #1f2937;
         padding: 15px;
@@ -20,32 +20,29 @@ st.markdown("""
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
     
-    /* Force metric labels to be light colored */
     [data-testid="stMetricLabel"] {
         color: #9ca3af !important;
         font-size: 0.875rem !important;
     }
     
-    /* Force metric values to be bright */
     [data-testid="stMetricValue"] {
         color: #e5e7eb !important;
         font-size: 1.5rem !important;
         font-weight: 600 !important;
     }
     
-    /* Force metric delta to be visible */
     [data-testid="stMetricDelta"] {
         color: #10b981 !important;
     }
     
-    /* Make Dataframes look like cyberpunk data grids */
+    /* Enhanced data grid styling */
     [data-testid="stDataFrame"] {
         background-color: #1f2937;
         border: 1px solid #374151;
         border-radius: 10px;
     }
     
-    /* Card container style for charts */
+    /* Consistent card container styling */
     .sentinel-card {
         background-color: #1f2937;
         padding: 20px;
@@ -54,22 +51,29 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* Headers */
+    /* Professional header styling */
     h1, h2, h3 {
         color: #a78bfa !important;
-        font-family: 'Courier New', monospace; 
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-weight: 600 !important;
     }
     
-    /* Remove padding to make it look like a dashboard, not a doc */
+    h1 { font-size: 2rem !important; }
+    h2 { font-size: 1.5rem !important; }
+    h3 { font-size: 1.25rem !important; }
+    
+    /* Optimized dashboard layout */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
+        max-width: 100%;
     }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Historical Analysis")
-st.markdown("### Full Day Analysis: 2,500 Transactions Processed")
+st.title("📊 Historical Analysis")
+st.markdown("### Complete Day Analysis: 2,500 Transactions Processed")
+st.markdown("---")
 
 # --- LOAD DATA ---
 @st.cache_data
@@ -117,8 +121,8 @@ if historical_data:
     baseline_profit = -2250.0
     roi = ((net_profit - baseline_profit) / abs(baseline_profit)) * 100 if baseline_profit else 0
     
-    # --- UI SECTION: TOP METRICS ---
-    st.markdown("## Analysis Overview")
+    # --- ANALYSIS OVERVIEW ---
+    st.markdown("## 📈 Analysis Overview")
     col1, col2, col3, col4, col5 = st.columns(5)
     
     with col1:
@@ -134,8 +138,8 @@ if historical_data:
     
     st.markdown("---")
     
-    # --- UI SECTION: PATTERN TABLE ---
-    st.markdown("## Pattern Detection Summary")
+    # --- PATTERN DETECTION SUMMARY ---
+    st.markdown("## 🔍 Pattern Detection Summary")
     
     pattern_rows = []
     for d in decisions:
@@ -164,8 +168,8 @@ if historical_data:
     
     st.markdown("---")
     
-    # --- UI SECTION: PROBLEM ANALYSIS CHARTS ---
-    st.markdown("## Problem Analysis: What Went Wrong?")
+    # --- PROBLEM ANALYSIS ---
+    st.markdown("## 🚨 Problem Analysis: What Went Wrong?")
     
     # Load raw transactions for richer analysis
     @st.cache_data
@@ -178,7 +182,7 @@ if historical_data:
     
     transactions = load_transactions()
     
-    col_prob1, col_prob2, col_prob3 = st.columns(3)
+    col_prob1, col_prob2 = st.columns(2)
     
     with col_prob1:
         st.markdown('<div class="sentinel-card">', unsafe_allow_html=True)
@@ -259,50 +263,6 @@ if historical_data:
             yaxis=dict(title="Failed Transactions", gridcolor="#374151")
         )
         st.plotly_chart(fig_cards, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col_prob3:
-        st.markdown('<div class="sentinel-card">', unsafe_allow_html=True)
-        st.markdown("### Impact by Customer Tier")
-        
-        # Aggregate failures by customer tier
-        tier_failures = {}
-        tier_totals = {}
-        for txn in transactions:
-            tier = txn.get("customer_tier", "Unknown")
-            tier_totals[tier] = tier_totals.get(tier, 0) + 1
-            if txn.get("status") == "FAILED":
-                tier_failures[tier] = tier_failures.get(tier, 0) + 1
-        
-        tiers = sorted(tier_failures.keys(), key=lambda x: tier_failures[x], reverse=True)
-        tier_counts = [tier_failures[t] for t in tiers]
-        tier_rates = [(tier_failures[t]/tier_totals[t]*100) if tier_totals[t] > 0 else 0 for t in tiers]
-        
-        # Color by tier priority
-        tier_colors_map = {'VIP': '#a78bfa', 'Regular': '#51cf66', 'New': '#ffd43b', 'Standard': '#868e96'}
-        tier_colors = [tier_colors_map.get(t, '#868e96') for t in tiers]
-        
-        fig_tiers = go.Figure()
-        fig_tiers.add_trace(go.Bar(
-            name="Failures",
-            x=tiers,
-            y=tier_counts,
-            marker_color=tier_colors,
-            text=[f"{c}<br>{r:.1f}%" for c, r in zip(tier_counts, tier_rates)],
-            textposition="inside"
-        ))
-        
-        fig_tiers.update_layout(
-            height=300,
-            margin=dict(l=10, r=10, t=10, b=10),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#fff", size=11),
-            showlegend=False,
-            xaxis=dict(title=""),
-            yaxis=dict(title="Failed Transactions", gridcolor="#374151")
-        )
-        st.plotly_chart(fig_tiers, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     # Second row - Temporal and Pattern Analysis
@@ -389,10 +349,10 @@ if historical_data:
     
     st.markdown("---")
     
-    # --- UI SECTION: SOLUTION ANALYSIS ---
-    st.markdown("## Solutions Applied: How We Fixed It")
+    # --- SOLUTIONS APPLIED ---
+    st.markdown("## ✅ Solutions Applied: How We Fixed It")
     
-    col_sol1, col_sol2, col_sol3 = st.columns(3)
+    col_sol1, col_sol2 = st.columns(2)
     
     with col_sol1:
         st.markdown('<div class="sentinel-card">', unsafe_allow_html=True)
@@ -469,61 +429,6 @@ if historical_data:
     
     with col_sol2:
         st.markdown('<div class="sentinel-card">', unsafe_allow_html=True)
-        st.markdown("### Risk vs Confidence Matrix")
-        
-        # Create scatter plot showing confidence vs volume, colored by risk
-        risk_colors_map = {
-            'payment_failure': '#ef5350',
-            'high_risk': '#ff6b6b',
-            'medium_risk': '#ffd43b',
-            'low_risk': '#51cf66'
-        }
-        
-        scatter_data = []
-        for d in decisions:
-            scatter_data.append({
-                'volume': d.get('affected_volume', 0),
-                'confidence': d.get('confidence', 0) * 100,
-                'risk': d.get('risk_category', 'unknown'),
-                'decision': d.get('decision', ''),
-                'pattern': d.get('pattern_detected', '')[:25] + "..."
-            })
-        
-        fig_scatter = go.Figure()
-        
-        # Plot by risk category
-        for risk in set(d['risk'] for d in scatter_data):
-            risk_points = [d for d in scatter_data if d['risk'] == risk]
-            fig_scatter.add_trace(go.Scatter(
-                x=[d['volume'] for d in risk_points],
-                y=[d['confidence'] for d in risk_points],
-                mode='markers',
-                name=risk.replace('_', ' ').title(),
-                marker=dict(
-                    size=[d['volume']/2 + 10 for d in risk_points],
-                    color=risk_colors_map.get(risk, '#868e96'),
-                    line=dict(width=2, color='#fff')
-                ),
-                text=[d['pattern'] for d in risk_points],
-                hovertemplate='<b>%{text}</b><br>Volume: %{x}<br>Confidence: %{y:.0f}%<extra></extra>'
-            ))
-        
-        fig_scatter.update_layout(
-            height=350,
-            margin=dict(l=10, r=10, t=10, b=10),
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            font=dict(color="#fff", size=11),
-            showlegend=True,
-            legend=dict(orientation="v", yanchor="top", y=1, xanchor="right", x=1),
-            xaxis=dict(title="Transaction Volume", gridcolor="#374151"),
-            yaxis=dict(title="Confidence %", gridcolor="#374151")
-        )
-        st.plotly_chart(fig_scatter, use_container_width=True)
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with col_sol3:
-        st.markdown('<div class="sentinel-card">', unsafe_allow_html=True)
         st.markdown("### Amount Range Distribution")
         
         # Extract amount ranges from patterns and aggregate
@@ -581,8 +486,8 @@ if historical_data:
     
     st.markdown("---")
     
-    # --- UI SECTION: FINANCIAL IMPACT ---
-    st.markdown("## Financial Impact: The Bottom Line")
+    # --- FINANCIAL IMPACT ---
+    st.markdown("## 💰 Financial Impact: The Bottom Line")
     
     col_fin1, col_fin2, col_fin3 = st.columns(3)
     
@@ -742,8 +647,8 @@ if historical_data:
         st.plotly_chart(fig_cumulative, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # --- UI SECTION: DETAILS ---
-    st.markdown("## Pattern Details")
+    # --- PATTERN DETAILS ---
+    st.markdown("## 📋 Pattern Details")
     
     for d in decisions:
         decision_type = d.get("decision", "")
@@ -763,8 +668,24 @@ if historical_data:
             st.markdown("**AI Reasoning:**")
             st.info(d.get('reasoning', ''))
     
-    # Key insights footer
-    st.success(f"**Key Insight:** SENTINEL analyzed a full day's payment data ({total_patterns} patterns from 2,500 transactions) and generated ₹{net_profit:,.0f} profit in {metadata.get('inference_time_seconds', 0)}s using autonomous AI decision-making.")
+    # Executive summary
+    st.markdown("---")
+    st.markdown("### 📋 Executive Summary")
+    
+    col_summary1, col_summary2, col_summary3 = st.columns(3)
+    with col_summary1:
+        st.metric("Total Patterns Analyzed", f"{total_patterns}", "AI-Detected")
+    with col_summary2:
+        st.metric("Processing Time", f"{metadata.get('inference_time_seconds', 0)}s", "Real-time")
+    with col_summary3:
+        st.metric("AI Model", "Llama 3.3 70B", "Advanced LLM")
+    
+    st.success(f"""
+    **🎯 Key Achievement:** SENTINEL successfully analyzed a complete day of payment transactions 
+    ({total_patterns} unique patterns from 2,500 transactions) and generated **₹{net_profit:,.0f} net profit** 
+    through autonomous AI-driven decision making, achieving a **{roi:.0f}% ROI** improvement over baseline 
+    performance in just {metadata.get('inference_time_seconds', 0)} seconds of processing time.
+    """)
 
 else:
     st.error("Historical analysis data not found. Run `python council_agent.py` first to generate decisions.json")
